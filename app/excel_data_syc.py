@@ -12,7 +12,8 @@ def cn_word_syc(file_path):
         select_name = select_data(db_path, select_sql)
         if select_name:
             continue
-        insert_sql = ("insert into cn_word(name, category, user, status, create_time) values('{}', {}, '{}', {}, {})"
+        insert_sql = ("insert into cn_word(name, category, user, status, create_time, update_time) "
+                      "values('{}', {}, '{}', {}, {}, 0)"
                       .format(row["name"], row["category"], row["user"], row["status"], int(time.time())))
         if insert_data(db_path, insert_sql) is False:
             return False

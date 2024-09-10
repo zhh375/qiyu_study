@@ -110,14 +110,18 @@ class MainLayout(BoxLayout):
                 popup.open()
 
     def on_button_cal_press(self, instance):
-        all_count, known_count, unknown_count = cal_cn_word()
+        all_count, known_count, unknown_count, today_count = cal_cn_word()
         if all_count is not False and known_count is not False:
             self.know_button_enable = False
             self.label.font_size = '30sp'
             self.label.text_size = (self.label.width, None)
             self.label.halign = 'left'
-            self.label.text = ("所有汉字：{all_count}个\n已学会汉字或词汇：{known_count}个\n未学会汉字或词汇：{unknown_count}个"
-                               .format(all_count=all_count[0][0], known_count=known_count[0][0], unknown_count=unknown_count[0][0]))
+            self.label.text = ("所有汉字：{all_count}个\n"
+                               "已学会汉字或词汇：{known_count}个\n"
+                               "未学会汉字或词汇：{unknown_count}个\n"
+                               "今天学会：{today_count}个"
+                               .format(all_count=all_count[0][0], known_count=known_count[0][0],
+                                unknown_count=unknown_count[0][0], today_count=today_count[0][0]))
         else:
             popup = Popup(title='提示', content=Label(text='统计失败'), size_hint=(None, None))
             popup.open()
@@ -159,12 +163,27 @@ class ToolLayout(BoxLayout):
         Window.clearcolor = (1, 1, 1, 1)
 
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='同步汉字', size_hint=(None, None), size=(200, 50), font_size='30sp')
+        btn = Button(text='同步汉字', size_hint=(None, None), size=(150, 50), font_size='30sp')
         btn.bind(on_press=self.show_file_chooser)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text=f'返回', size_hint=(None, None), size=(200, 50), font_size='30sp')
+        btn = Button(text='同步英文', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn.bind(on_press=self.show_file_chooser)
+        anchor_layout.add_widget(btn)
+        self.add_widget(anchor_layout)
+        anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
+        btn = Button(text='骰子', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn.bind(on_press=self.show_file_chooser)
+        anchor_layout.add_widget(btn)
+        self.add_widget(anchor_layout)
+        anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
+        btn = Button(text='随机数', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn.bind(on_press=self.show_file_chooser)
+        anchor_layout.add_widget(btn)
+        self.add_widget(anchor_layout)
+        anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
+        btn = Button(text=f'返回', size_hint=(None, None), size=(150, 50), font_size='30sp')
         btn.bind(on_press=self.on_button_back_press)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
