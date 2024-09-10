@@ -7,10 +7,11 @@ from kivy.uix.popup import Popup
 from app.init_db import init_db
 from kivy.core.text import LabelBase
 from kivy.uix.anchorlayout import AnchorLayout
-from kivy.uix.scrollview import ScrollView
+from kivy.uix.filechooser import FileChooserListView
 from kivy.resources import resource_add_path
 import os
 from app.cn_word import query_random_cn_word, update_cn_word, cal_cn_word
+from app.excel_data_syc import cn_word_syc
 
 
 init_db()
@@ -46,13 +47,7 @@ class MainLayout(BoxLayout):
         btn.bind(on_press=self.on_button_know_press)
         button_layout.add_widget(btn)
 
-        scroll_view = ScrollView(size_hint=(1, None), do_scroll_x=False)
-        scroll_view.size = (Window.width, Window.height - 170)
-        inner_layout = BoxLayout(size_hint_y=None, height=300)
-        inner_layout.bind(minimum_height=inner_layout.setter('height'))
         self.label = Label(text=display_value["cn_word"]["name"], font_size='200sp', color=(0, 0, 0, 1))
-        inner_layout.add_widget(self.label)
-        scroll_view.add_widget(inner_layout)
 
         bottom_button_layout = BoxLayout(size_hint_y=None, height=30)
         btn = Button(text='统计', font_size='10sp')
@@ -69,7 +64,7 @@ class MainLayout(BoxLayout):
         bottom_button_layout.add_widget(btn)
 
         self.add_widget(button_layout)
-        self.add_widget(scroll_view)
+        self.add_widget(self.label)
         self.add_widget(bottom_button_layout)
 
     def on_button_next_one_press(self, instance):
@@ -145,20 +140,8 @@ class MainLayout(BoxLayout):
             self.on_button_next_one_press(instance)
         elif display_value["cn_word"]["query_mode"] == 1:
             display_value["cn_word"]["query_mode"] = 2     # 随机已学会
-            self.query_mode_btn.text = "展示全部"
+            self.query_mode_btn.text = "随机未学会"
             self.on_button_next_one_press(instance)
-        elif display_value["cn_word"]["query_mode"] == 2:
-            display_value["cn_word"]["query_mode"] = 0     # 展示所有
-            # self.query_mode_btn.text = "随机未学会"
-            # result = query_random_cn_word(display_value["cn_word"]["query_mode"])
-            # if result is not False:
-            #     cn_word_list = []
-            #     for row in result:
-            #         cn_word_list.append(row[1])
-            #     self.label.font_size = '20sp'
-            #     self.label.text_size = (self.label.width, None)
-            #     self.label.halign = 'left'
-            #     self.label.text = "\n".join(cn_word_list)
         else:
             display_value["cn_word"]["query_mode"] = 0     # 随机未学会
             self.query_mode_btn.text = "随机所有"
@@ -168,6 +151,7 @@ class MainLayout(BoxLayout):
 class ToolLayout(BoxLayout):
     def __init__(self, **kwargs):
         super(ToolLayout, self).__init__(**kwargs)
+        self.popup = None
         self.orientation = 'vertical'
         self.spacing = 10
         self.padding = 10
@@ -176,7 +160,7 @@ class ToolLayout(BoxLayout):
 
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
         btn = Button(text='同步汉字', size_hint=(None, None), size=(200, 50), font_size='30sp')
-        btn.bind(on_press=self.on_button_syc_cn_word_press)
+        btn.bind(on_press=self.show_file_chooser)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
@@ -185,10 +169,40 @@ class ToolLayout(BoxLayout):
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
 
-    @staticmethod
-    def on_button_syc_cn_word_press(instance):
-        popup = Popup(title='提示', content=Label(text='暂未实现'), size_hint=(None, None))
-        popup.open()
+    def show_file_chooser(self, instance):
+        file_chooser = FileChooserListView(path=os.path.dirname(__file__), filters=['*.xlsx', '*.xls'])
+
+        popup_content = BoxLayout(orientation='vertical')
+        popup_content.add_widget(file_chooser)
+
+        button_layout = BoxLayout(size_hint=(1, None), height='50dp')
+
+        ok_button = Button(text="确定", size_hint=(0.5, 1))
+        ok_button.bind(on_press=lambda x: self.on_button_syc_cn_word_press(instance, file_chooser.path, file_chooser.selection))
+        button_layout.add_widget(ok_button)
+
+        cancel_button = Button(text="取消", size_hint=(0.5, 1))
+        cancel_button.bind(on_press=self.dismiss_popup)
+        button_layout.add_widget(cancel_button)
+
+        popup_content.add_widget(button_layout)
+
+        # 显示弹出窗口
+        self.popup = Popup(title="选择 Excel 文件", content=popup_content, size_hint=(0.9, 0.9))
+        self.popup.open()
+
+    def dismiss_popup(self, instance):
+        self.popup.dismiss()
+
+    def on_button_syc_cn_word_press(self, instance, path, filename):
+        if filename:
+            filepath = os.path.join(path, filename[0])
+            if cn_word_syc(filepath):
+                popup = Popup(title='提示', content=Label(text='同步成功'), size_hint=(None, None))
+            else:
+                popup = Popup(title='提示', content=Label(text='同步失败'), size_hint=(None, None))
+            self.dismiss_popup(instance)
+            popup.open()
 
     @staticmethod
     def on_button_back_press(instance):
