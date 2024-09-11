@@ -8,8 +8,11 @@ from app.init_db import init_db
 from kivy.core.text import LabelBase
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.filechooser import FileChooserListView
+from kivy.clock import Clock
 from kivy.resources import resource_add_path
+from kivy.animation import Animation
 import os
+import random
 from app.cn_word import query_random_cn_word, update_cn_word, cal_cn_word
 from app.excel_data_syc import cn_word_syc
 
@@ -174,12 +177,12 @@ class ToolLayout(BoxLayout):
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
         btn = Button(text='骰子', size_hint=(None, None), size=(150, 50), font_size='30sp')
-        # btn.bind(on_press=self.show_file_chooser)
+        btn.bind(on_press=self.dice_page)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
         btn = Button(text='随机数', size_hint=(None, None), size=(150, 50), font_size='30sp')
-        # btn.bind(on_press=self.show_file_chooser)
+        btn.bind(on_press=self.rand_page)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
@@ -229,6 +232,98 @@ class ToolLayout(BoxLayout):
         app.root.clear_widgets()
         app.root.add_widget(MainLayout())
 
+    @staticmethod
+    def rand_page(instance):
+        app = App.get_running_app()
+        app.root.clear_widgets()
+        app.root.add_widget(RandLayout())
+
+    @staticmethod
+    def dice_page(instance):
+        app = App.get_running_app()
+        app.root.clear_widgets()
+        app.root.add_widget(DiceLayout())
+
+class DiceLayout(BoxLayout):
+    def __init__(self, **kwargs):
+        super(DiceLayout, self).__init__(**kwargs)
+        self.popup = None
+        self.anim = None
+        self.orientation = 'vertical'
+        self.spacing = 10
+        self.padding = 10
+
+        Window.clearcolor = (1, 1, 1, 1)
+
+        self.label = Label(text="", font_size='200sp', color=(0, 0, 0, 1))
+        self.add_widget(self.label)
+
+        anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
+        btn = Button(text='转一次', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn.bind(on_press=self.dice_press)
+        anchor_layout.add_widget(btn)
+        self.add_widget(anchor_layout)
+
+        anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
+        btn = Button(text='返回', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn.bind(on_press=self.back)
+        anchor_layout.add_widget(btn)
+        self.add_widget(anchor_layout)
+
+    @staticmethod
+    def back(instance):
+        app = App.get_running_app()
+        app.root.clear_widgets()
+        app.root.add_widget(ToolLayout())
+
+    def dice_press(self, instance):
+        self.label.text = '...'
+        self.anim = Animation(opacity=0.5, duration=0.5) + Animation(opacity=1, duration=0.5)
+        self.anim.repeat = True
+        self.anim.start(self.label)
+
+        # 2秒后停止动画并显示结果
+        Clock.schedule_once(self.show_dice_result, 1)
+
+    def show_dice_result(self, dt):
+        self.anim.stop(self.label)
+        dice_value = random.randint(1, 6)
+        self.label.text = str(dice_value)
+
+
+class RandLayout(BoxLayout):
+    def __init__(self, **kwargs):
+        super(RandLayout, self).__init__(**kwargs)
+        self.popup = None
+        self.orientation = 'vertical'
+        self.spacing = 10
+        self.padding = 10
+
+        Window.clearcolor = (1, 1, 1, 1)
+
+        self.label = Label(text="Go", font_size='200sp', color=(0, 0, 0, 1))
+        self.add_widget(self.label)
+
+        anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
+        btn = Button(text='随机', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn.bind(on_press=self.rand_press)
+        anchor_layout.add_widget(btn)
+        self.add_widget(anchor_layout)
+
+        anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
+        btn = Button(text='返回', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn.bind(on_press=self.back)
+        anchor_layout.add_widget(btn)
+        self.add_widget(anchor_layout)
+
+    def rand_press(self, instance):
+        self.label.text = str(random.randint(1, 10))
+
+    @staticmethod
+    def back(instance):
+        app = App.get_running_app()
+        app.root.clear_widgets()
+        app.root.add_widget(ToolLayout())
 
 class QiyuApp(App):
     def build(self):
