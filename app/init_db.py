@@ -8,8 +8,8 @@ db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "db/qiyu.db")
 
 
 def init_db():
-    if not os.path.exists(db_path):
-        print_format("db目录不存在，创建db", "yellow")
+    # if not os.path.exists(db_path):
+    #     print_format("db目录不存在，创建db", "yellow")
         create_table(db_path,
                      "CREATE TABLE IF NOT EXISTS cn_word ("
                             "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -35,12 +35,12 @@ def init_db():
                             "create_time INTEGER, "
                             "update_time INTEGER)")
         insert_data(db_path,
-                    "INSERT INTO cn_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
+                    "INSERT INTO en_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
                     "VALUES (0, 'start', 1, '琦琦', 0, 0, 0, {}, 0)".format(int(time.time())))
         insert_data(db_path,
-                    "INSERT INTO cn_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
+                    "INSERT INTO en_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
                     "VALUES (1, 'I like ', 1, '琦琦', 1, 0, 0, {}, 0)".format(int(time.time())))
         insert_data(db_path,
-                    "INSERT INTO cn_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
+                    "INSERT INTO en_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
                     "VALUES (2, 'english', 1, '琦琦', 0, 0, 1, {}, 0)".format(int(time.time())))
 

@@ -132,15 +132,16 @@ class MainLayout(BoxLayout):
             popup.open()
 
     @staticmethod
-    def on_button_change_mode_press(instance):
-        popup = Popup(title='提示', content=Label(text='暂未实现'), size_hint=(None, None))
-        popup.open()
-
-    @staticmethod
     def on_button_tool_press(instance):
         app = App.get_running_app()
         app.root.clear_widgets()
         app.root.add_widget(ToolLayout())
+
+    @staticmethod
+    def on_button_change_mode_press(instance):
+        app = App.get_running_app()
+        app.root.clear_widgets()
+        app.root.add_widget(EnLayout())
 
     def on_button_cn_word_change_press(self, instance):
         if display_value["cn_word"]["query_mode"] == 0:
@@ -167,6 +168,7 @@ class EnLayout(BoxLayout):
         self.know_button_enable = True
         self.query_mode_btn = None
         self.label = None
+        self.gif_image = None
 
         Window.clearcolor = (1, 1, 1, 1)
 
@@ -178,16 +180,20 @@ class EnLayout(BoxLayout):
         btn.bind(on_press=self.on_button_know_press)
         button_layout.add_widget(btn)
 
-        self.label = Label(text=display_value["cn_word"]["name"], font_size='200sp', color=(0, 0, 0, 1))
+        layout = BoxLayout(orientation='vertical')
+        self.gif_image = Image(source=os.path.join(image_path, 'dice_1.jpg'))
+        layout.add_widget(self.gif_image)
+
+        self.label = Label(text=display_value["cn_word"]["name"], font_size='30sp', color=(0, 0, 0, 1))
 
         bottom_button_layout = BoxLayout(size_hint_y=None, height=30)
         btn = Button(text='统计', font_size='15sp')
         btn.bind(on_press=self.on_button_cal_press)
         bottom_button_layout.add_widget(btn)
         self.query_mode_btn = Button(text='随机所有', font_size='15sp')
-        self.query_mode_btn.bind(on_press=self.on_button_cn_word_change_press)
+        self.query_mode_btn.bind(on_press=self.on_button_en_word_change_press)
         bottom_button_layout.add_widget(self.query_mode_btn)
-        btn = Button(text='英文', font_size='15sp')
+        btn = Button(text='中文', font_size='15sp')
         btn.bind(on_press=self.on_button_change_mode_press)
         bottom_button_layout.add_widget(btn)
         btn = Button(text='工具', font_size='15sp')
@@ -195,8 +201,94 @@ class EnLayout(BoxLayout):
         bottom_button_layout.add_widget(btn)
 
         self.add_widget(button_layout)
+        self.add_widget(layout)
         self.add_widget(self.label)
         self.add_widget(bottom_button_layout)
+
+    @staticmethod
+    def on_button_change_mode_press(instance):
+        app = App.get_running_app()
+        app.root.clear_widgets()
+        app.root.add_widget(MainLayout())
+
+    def on_button_next_one_press(self, instance):
+        if display_value["cn_word"]["query_mode"] != 3:
+            result = query_random_cn_word(display_value["cn_word"]["query_mode"])
+            if result is not False:
+                self.know_button_enable = True
+                display_value["cn_word"]["id"] = result[0][0]
+                display_value["cn_word"]["name"] = result[0][1]
+                display_value["cn_word"]["category"] = result[0][2]
+                display_value["cn_word"]["user"] = result[0][3]
+                display_value["cn_word"]["status"] = result[0][4]
+                if len(display_value["cn_word"]["name"]) > 2:
+                    self.label.font_size = '150sp'
+                    self.label.halign = 'center'
+                elif len(display_value["cn_word"]["name"]) > 4:
+                    self.label.font_size = '100sp'
+                    self.label.halign = 'center'
+                elif len(display_value["cn_word"]["name"]) > 6:
+                    self.label.font_size = '50sp'
+                    self.label.halign = 'center'
+                elif len(display_value["cn_word"]["name"]) > 8:
+                    self.label.font_size = '50sp'
+                    self.label.text_size = (self.label.width, None)
+                    self.label.halign = 'left'
+                else:
+                    self.label.font_size = '200sp'
+                    self.label.halign = 'center'
+
+                self.label.text = display_value["cn_word"]["name"]
+            else:
+                popup = Popup(title='提示', content=Label(text='查询为空'), size_hint=(None, None))
+                popup.open()
+
+    def on_button_know_press(self, instance):
+        if display_value["cn_word"]["query_mode"] != 3 and self.know_button_enable is True:
+            result = update_cn_word(display_value["cn_word"]["id"], display_value["cn_word"]["category"], 1)
+            if result is not False:
+                display_value["cn_word"]["status"] = 1
+                self.on_button_next_one_press(instance)
+            else:
+                popup = Popup(title='提示', content=Label(text='设置失败'), size_hint=(None, None))
+                popup.open()
+
+    def on_button_cal_press(self, instance):
+        all_count, known_count, unknown_count, today_count = cal_cn_word()
+        if all_count is not False and known_count is not False:
+            self.know_button_enable = False
+            self.label.font_size = '30sp'
+            self.label.text_size = (self.label.width, None)
+            self.label.halign = 'left'
+            self.label.text = ("所有汉字：{all_count}个\n"
+                               "已学会汉字或词汇：{known_count}个\n"
+                               "未学会汉字或词汇：{unknown_count}个\n"
+                               "今天学会：{today_count}个"
+                               .format(all_count=all_count[0][0], known_count=known_count[0][0],
+                                unknown_count=unknown_count[0][0], today_count=today_count[0][0]))
+        else:
+            popup = Popup(title='提示', content=Label(text='统计失败'), size_hint=(None, None))
+            popup.open()
+
+    @staticmethod
+    def on_button_tool_press(instance):
+        app = App.get_running_app()
+        app.root.clear_widgets()
+        app.root.add_widget(ToolLayout())
+
+    def on_button_en_word_change_press(self, instance):
+        if display_value["cn_word"]["query_mode"] == 0:
+            display_value["cn_word"]["query_mode"] = 1     # 随机所有
+            self.query_mode_btn.text = "随机已学会"
+            self.on_button_next_one_press(instance)
+        elif display_value["cn_word"]["query_mode"] == 1:
+            display_value["cn_word"]["query_mode"] = 2     # 随机已学会
+            self.query_mode_btn.text = "随机未学会"
+            self.on_button_next_one_press(instance)
+        else:
+            display_value["cn_word"]["query_mode"] = 0     # 随机未学会
+            self.query_mode_btn.text = "随机所有"
+            self.on_button_next_one_press(instance)
 
 
 class ToolLayout(BoxLayout):
@@ -299,9 +391,6 @@ class DiceLayout(BoxLayout):
         self.padding = 10
 
         Window.clearcolor = (1, 1, 1, 1)
-
-        # self.label = Label(text="Go", font_size='200sp', color=(0, 0, 0, 1))
-        # self.add_widget(self.label)
 
         layout = BoxLayout(orientation='vertical')
         self.gif_image = Image(source=os.path.join(image_path, 'dice.jpg'))
