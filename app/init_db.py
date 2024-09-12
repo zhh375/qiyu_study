@@ -39,7 +39,7 @@ def init_db():
                     "VALUES (0, 'start', 1, '琦琦', 0, 0, 0, {}, 0)".format(int(time.time())))
         insert_data(db_path,
                     "INSERT INTO en_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
-                    "VALUES (1, 'I like ', 1, '琦琦', 1, 0, 0, {}, 0)".format(int(time.time())))
+                    "VALUES (1, 'I like ', 1, '琦琦', 1, 0, 1, {}, 0)".format(int(time.time())))
         insert_data(db_path,
                     "INSERT INTO en_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
                     "VALUES (2, 'english', 1, '琦琦', 0, 0, 1, {}, 0)".format(int(time.time())))
