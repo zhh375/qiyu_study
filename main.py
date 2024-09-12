@@ -6,6 +6,7 @@ from kivy.core.window import Window
 from kivy.uix.popup import Popup
 from app.init_db import init_db
 from kivy.core.text import LabelBase
+from kivy.uix.image import Image
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.filechooser import FileChooserListView
 from kivy.clock import Clock
@@ -20,6 +21,7 @@ from app.excel_data_syc import cn_word_syc
 init_db()
 
 
+image_path = os.path.join(os.path.dirname(__file__), "data/image/")
 resource_add_path(os.path.join(os.path.dirname(__file__), "data/fonts/"))
 LabelBase.register('Roboto', 'stkaiti.ttf')
 
@@ -249,14 +251,20 @@ class DiceLayout(BoxLayout):
         super(DiceLayout, self).__init__(**kwargs)
         self.popup = None
         self.anim = None
+        self.gif_image = None
         self.orientation = 'vertical'
         self.spacing = 10
         self.padding = 10
 
         Window.clearcolor = (1, 1, 1, 1)
 
-        self.label = Label(text="", font_size='200sp', color=(0, 0, 0, 1))
-        self.add_widget(self.label)
+        # self.label = Label(text="Go", font_size='200sp', color=(0, 0, 0, 1))
+        # self.add_widget(self.label)
+
+        layout = BoxLayout(orientation='vertical')
+        self.gif_image = Image(source=os.path.join(image_path, 'dice.jpg'))
+        layout.add_widget(self.gif_image)
+        self.add_widget(layout)
 
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
         btn = Button(text='转一次', size_hint=(None, None), size=(150, 50), font_size='30sp')
@@ -277,19 +285,7 @@ class DiceLayout(BoxLayout):
         app.root.add_widget(ToolLayout())
 
     def dice_press(self, instance):
-        self.label.text = '...'
-        self.anim = Animation(opacity=0.5, duration=0.5) + Animation(opacity=1, duration=0.5)
-        self.anim.repeat = True
-        self.anim.start(self.label)
-
-        # 2秒后停止动画并显示结果
-        Clock.schedule_once(self.show_dice_result, 1)
-
-    def show_dice_result(self, dt):
-        self.anim.stop(self.label)
-        dice_value = random.randint(1, 6)
-        self.label.text = str(dice_value)
-
+        self.gif_image.source = os.path.join(image_path, 'dice_'+str(random.randint(1, 6))+'.jpg')
 
 class RandLayout(BoxLayout):
     def __init__(self, **kwargs):
