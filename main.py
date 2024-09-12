@@ -55,16 +55,16 @@ class MainLayout(BoxLayout):
         self.label = Label(text=display_value["cn_word"]["name"], font_size='200sp', color=(0, 0, 0, 1))
 
         bottom_button_layout = BoxLayout(size_hint_y=None, height=30)
-        btn = Button(text='统计', font_size='10sp')
+        btn = Button(text='统计', font_size='15sp')
         btn.bind(on_press=self.on_button_cal_press)
         bottom_button_layout.add_widget(btn)
-        self.query_mode_btn = Button(text='随机所有', font_size='10sp')
+        self.query_mode_btn = Button(text='随机所有', font_size='15sp')
         self.query_mode_btn.bind(on_press=self.on_button_cn_word_change_press)
         bottom_button_layout.add_widget(self.query_mode_btn)
-        btn = Button(text='英文', font_size='10sp')
+        btn = Button(text='英文', font_size='15sp')
         btn.bind(on_press=self.on_button_change_mode_press)
         bottom_button_layout.add_widget(btn)
-        btn = Button(text='工具', font_size='10sp')
+        btn = Button(text='工具', font_size='15sp')
         btn.bind(on_press=self.on_button_tool_press)
         bottom_button_layout.add_widget(btn)
 
@@ -155,6 +155,48 @@ class MainLayout(BoxLayout):
             display_value["cn_word"]["query_mode"] = 0     # 随机未学会
             self.query_mode_btn.text = "随机所有"
             self.on_button_next_one_press(instance)
+
+
+class EnLayout(BoxLayout):
+    def __init__(self, **kwargs):
+        super(EnLayout, self).__init__(**kwargs)
+        self.orientation = 'vertical'
+        self.spacing = 10
+        self.padding = 10
+
+        self.know_button_enable = True
+        self.query_mode_btn = None
+        self.label = None
+
+        Window.clearcolor = (1, 1, 1, 1)
+
+        button_layout = BoxLayout(size_hint_y=None, height=100)
+        btn = Button(text='下一个', size_hint_x=1.5, font_size='30sp', background_color=(0, 1, 0, 1), color=(1, 1, 1, 1))
+        btn.bind(on_press=self.on_button_next_one_press)
+        button_layout.add_widget(btn)
+        btn = Button(text=f'已学会', font_size='30sp')
+        btn.bind(on_press=self.on_button_know_press)
+        button_layout.add_widget(btn)
+
+        self.label = Label(text=display_value["cn_word"]["name"], font_size='200sp', color=(0, 0, 0, 1))
+
+        bottom_button_layout = BoxLayout(size_hint_y=None, height=30)
+        btn = Button(text='统计', font_size='15sp')
+        btn.bind(on_press=self.on_button_cal_press)
+        bottom_button_layout.add_widget(btn)
+        self.query_mode_btn = Button(text='随机所有', font_size='15sp')
+        self.query_mode_btn.bind(on_press=self.on_button_cn_word_change_press)
+        bottom_button_layout.add_widget(self.query_mode_btn)
+        btn = Button(text='英文', font_size='15sp')
+        btn.bind(on_press=self.on_button_change_mode_press)
+        bottom_button_layout.add_widget(btn)
+        btn = Button(text='工具', font_size='15sp')
+        btn.bind(on_press=self.on_button_tool_press)
+        bottom_button_layout.add_widget(btn)
+
+        self.add_widget(button_layout)
+        self.add_widget(self.label)
+        self.add_widget(bottom_button_layout)
 
 
 class ToolLayout(BoxLayout):

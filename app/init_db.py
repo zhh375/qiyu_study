@@ -29,17 +29,18 @@ def init_db():
                             "name TEXT, "
                             "category INTEGER, "
                             "user TEXT, "
+                            "type INTEGER, "
                             "status INTEGER, "
                             "parent_id INTEGER, "
                             "create_time INTEGER, "
                             "update_time INTEGER)")
         insert_data(db_path,
-                    "INSERT INTO cn_word (id, name, category, user, status, parent_id, create_time, update_time) "
-                    "VALUES (0, 'start', 1, '琦琦', 0, 0, {}, 0)".format(int(time.time())))
+                    "INSERT INTO cn_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
+                    "VALUES (0, 'start', 1, '琦琦', 0, 0, 0, {}, 0)".format(int(time.time())))
         insert_data(db_path,
-                    "INSERT INTO cn_word (id, name, category, user, status, parent_id, create_time, update_time) "
-                    "VALUES (1, 'I like ', 1, '琦琦', 0, 0, {}, 0)".format(int(time.time())))
+                    "INSERT INTO cn_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
+                    "VALUES (1, 'I like ', 1, '琦琦', 1, 0, 0, {}, 0)".format(int(time.time())))
         insert_data(db_path,
-                    "INSERT INTO cn_word (id, name, category, user, status, parent_id, create_time, update_time) "
-                    "VALUES (2, 'english', 1, '琦琦', 0, 1, {}, 0)".format(int(time.time())))
+                    "INSERT INTO cn_word (id, name, category, user, type, status, parent_id, create_time, update_time) "
+                    "VALUES (2, 'english', 1, '琦琦', 0, 0, 1, {}, 0)".format(int(time.time())))
 
