@@ -9,13 +9,11 @@ from kivy.core.text import LabelBase
 from kivy.uix.image import Image
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.filechooser import FileChooserListView
-from kivy.clock import Clock
 from kivy.resources import resource_add_path
-from kivy.animation import Animation
 import os
 import random
 from app.cn_word import query_random_cn_word, update_cn_word, cal_cn_word
-from app.excel_data_syc import cn_word_syc
+from app.excel_data_syc import cn_word_syc, en_word_syc
 
 
 init_db()
@@ -294,7 +292,8 @@ class EnLayout(BoxLayout):
 class ToolLayout(BoxLayout):
     def __init__(self, **kwargs):
         super(ToolLayout, self).__init__(**kwargs)
-        self.popup = None
+        self.popup_cn = None
+        self.popup_en = None
         self.orientation = 'vertical'
         self.spacing = 10
         self.padding = 10
@@ -303,12 +302,12 @@ class ToolLayout(BoxLayout):
 
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
         btn = Button(text='同步汉字', size_hint=(None, None), size=(150, 50), font_size='30sp')
-        btn.bind(on_press=self.show_file_chooser)
+        btn.bind(on_press=self.show_file_chooser_cn)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
         btn = Button(text='同步英文', size_hint=(None, None), size=(150, 50), font_size='30sp')
-        # btn.bind(on_press=self.show_file_chooser)
+        btn.bind(on_press=self.show_file_chooser_en)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
@@ -327,7 +326,7 @@ class ToolLayout(BoxLayout):
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
 
-    def show_file_chooser(self, instance):
+    def show_file_chooser_cn(self, instance):
         file_chooser = FileChooserListView(path=os.path.dirname(__file__), filters=['*.xlsx', '*.xls'])
 
         popup_content = BoxLayout(orientation='vertical')
@@ -340,17 +339,14 @@ class ToolLayout(BoxLayout):
         button_layout.add_widget(ok_button)
 
         cancel_button = Button(text="取消", size_hint=(0.5, 1))
-        cancel_button.bind(on_press=self.dismiss_popup)
+        cancel_button.bind(on_press=self.dismiss_popup_cn)
         button_layout.add_widget(cancel_button)
 
         popup_content.add_widget(button_layout)
 
         # 显示弹出窗口
-        self.popup = Popup(title="选择 Excel 文件", content=popup_content, size_hint=(0.9, 0.9))
-        self.popup.open()
-
-    def dismiss_popup(self, instance):
-        self.popup.dismiss()
+        self.popup_cn = Popup(title="选择 Excel 文件", content=popup_content, size_hint=(0.9, 0.9))
+        self.popup_cn.open()
 
     def on_button_syc_cn_word_press(self, instance, path, filename):
         if filename:
@@ -359,8 +355,46 @@ class ToolLayout(BoxLayout):
                 popup = Popup(title='提示', content=Label(text='同步成功'), size_hint=(None, None))
             else:
                 popup = Popup(title='提示', content=Label(text='同步失败'), size_hint=(None, None))
-            self.dismiss_popup(instance)
+            self.dismiss_popup_cn(instance)
             popup.open()
+
+    def show_file_chooser_en(self, instance):
+        file_chooser = FileChooserListView(path=os.path.dirname(__file__), filters=['*.xlsx', '*.xls'])
+
+        popup_content = BoxLayout(orientation='vertical')
+        popup_content.add_widget(file_chooser)
+
+        button_layout = BoxLayout(size_hint=(1, None), height='50dp')
+
+        ok_button = Button(text="确定", size_hint=(0.5, 1))
+        ok_button.bind(on_press=lambda x: self.on_button_syc_en_word_press(instance, file_chooser.path, file_chooser.selection))
+        button_layout.add_widget(ok_button)
+
+        cancel_button = Button(text="取消", size_hint=(0.5, 1))
+        cancel_button.bind(on_press=self.dismiss_popup_en)
+        button_layout.add_widget(cancel_button)
+
+        popup_content.add_widget(button_layout)
+
+        # 显示弹出窗口
+        self.popup_en = Popup(title="选择 Excel 文件", content=popup_content, size_hint=(0.9, 0.9))
+        self.popup_en.open()
+
+    def on_button_syc_en_word_press(self, instance, path, filename):
+        if filename:
+            filepath = os.path.join(path, filename[0])
+            if en_word_syc(filepath):
+                popup = Popup(title='提示', content=Label(text='同步成功'), size_hint=(None, None))
+            else:
+                popup = Popup(title='提示', content=Label(text='同步失败'), size_hint=(None, None))
+            self.dismiss_popup_en(instance)
+            popup.open()
+
+    def dismiss_popup_cn(self, instance):
+        self.popup_cn.dismiss()
+
+    def dismiss_popup_en(self, instance):
+        self.popup_en.dismiss()
 
     @staticmethod
     def on_button_back_press(instance):

@@ -24,20 +24,30 @@ def cn_word_syc(file_path):
 def en_word_syc(file_path):
     db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "db/qiyu.db")
     data = read_excel(file_path)
-    parent_id = {}
     for row in data:
+        row["name"] = row["name"].replace("'", "''")
         if row["type"] == 1:
-            parent_id[row["name"]] = row["parent_id"]
             select_sql = ("select id from en_word where name='{}' and type=1".format(row["name"]))
             select_name = select_data(db_path, select_sql)
             if select_name:
                 continue
             insert_sql = ("insert into en_word(name, category, user, type, status, parent_id, create_time, update_time) "
-                          "values('{}', {}, '{}', 1, {}, 0, {}, 0)"
-                          .format(row["name"], row["category"], row["user"], row["status"], int(time.time())))
+                          "values('{}', {}, '{}', 1, {}, {}, {}, 0)"
+                          .format(row["name"], row["category"], row["user"], row["status"], row["parent_id"],
+                          int(time.time())))
             if insert_data(db_path, insert_sql) is False:
                 return False
-        elif row["type"] == 2:
-            select_sql = ("select id from en_word where name='{}'".format(row["name"]))
+        elif row["type"] == 0:
+            select_sql = ("select id from en_word where name='{}' and type=0 and parent_id={}"
+                          .format(row["name"], row["parent_id"]))
+            select_name = select_data(db_path, select_sql)
+            if select_name:
+                continue
+            insert_sql = ("insert into en_word(name, category, user, type, status, parent_id, create_time, update_time) "
+                          "values('{}', {}, '{}', 0, {}, {}, {}, 0)"
+                          .format(row["name"], row["category"], row["user"], row["status"], row["parent_id"],
+                          int(time.time())))
+            if insert_data(db_path, insert_sql) is False:
+                return False
 
     return True
