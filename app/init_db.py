@@ -8,8 +8,8 @@ db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "db/qiyu.db")
 
 
 def init_db():
-    # if not os.path.exists(db_path):
-    #     print_format("db目录不存在，创建db", "yellow")
+    if not os.path.exists(db_path):
+        print_format("db目录不存在，创建db", "yellow")
         create_table(db_path,
                      "CREATE TABLE IF NOT EXISTS cn_word ("
                             "id INTEGER PRIMARY KEY AUTOINCREMENT, "
