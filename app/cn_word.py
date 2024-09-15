@@ -22,6 +22,9 @@ def query_cn_word(name=None, category=None, user=None, status=None):
 
 
 def add_cn_word(name, category, user, status):
+    sql = "select id from cn_word where name='{}'".format(name)
+    if select_data(db_path, sql):
+        return False
     sql = ("insert into cn_word(name, category, user, status, create_time, update_time) "
            "values('{}',{},'{}',{}, {}, {})").format(name, category, user, status, int(time.time()), int(time.time()))
     return insert_data(db_path, sql)
@@ -43,13 +46,13 @@ def query_random_cn_word(query_mode):
     :param query_mode: 0-随机未学会， 1-随机所有， 2-随机已学会， 3-展示所有
     :return:
     """
-    sql = "select id, name, category, status, user, update_time from cn_word where status=0 order by random() limit 1"
+    sql = "select id, name, category, status, user, update_time from cn_word where status=0 and category!=0 order by random() limit 1"
     if query_mode == 1:
-        sql = "select id, name, category, status, user, update_time from cn_word order by random() limit 1"
+        sql = "select id, name, category, status, user, update_time from cn_word where category!=0 order by random() limit 1"
     elif query_mode == 2:
-        sql = "select id, name, category, status, user, update_time from cn_word where status=1 order by random() limit 1"
+        sql = "select id, name, category, status, user, update_time from cn_word where status=1 and category!=0 order by random() limit 1"
     elif query_mode == 3:
-        sql = "select id, name, category, status, user, update_time from cn_word order by id desc"
+        sql = "select id, name, category, status, user, update_time from cn_word where category=0 order by random() limit 1"
     return select_data(db_path, sql)
 
 
