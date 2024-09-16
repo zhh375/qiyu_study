@@ -43,16 +43,16 @@ def update_cn_word(word_id, category, status):
 def query_random_cn_word(query_mode):
     """
     随机查询一条记录
-    :param query_mode: 0-随机未学会， 1-随机所有， 2-随机已学会， 3-展示所有
+    :param query_mode: 0-随机未学会， 1-随机所有， 2-随机已学会， 3-随机拼音
     :return:
     """
-    sql = "select id, name, category, status, user, update_time from cn_word where status=0 and category!=0 order by random() limit 1"
+    sql = "select id, name, category, user, status, update_time from cn_word where status=0 and category!=0 order by random() limit 1"
     if query_mode == 1:
-        sql = "select id, name, category, status, user, update_time from cn_word where category!=0 order by random() limit 1"
+        sql = "select id, name, category, user, status, update_time from cn_word where category!=0 order by random() limit 1"
     elif query_mode == 2:
-        sql = "select id, name, category, status, user, update_time from cn_word where status=1 and category!=0 order by random() limit 1"
+        sql = "select id, name, category, user, status, update_time from cn_word where status=1 and category!=0 order by random() limit 1"
     elif query_mode == 3:
-        sql = "select id, name, category, status, user, update_time from cn_word where category=0 order by random() limit 1"
+        sql = "select id, name, category, user, status, update_time from cn_word where category=0 order by random() limit 1"
     return select_data(db_path, sql)
 
 

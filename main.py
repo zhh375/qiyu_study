@@ -14,6 +14,7 @@ from kivy.resources import resource_add_path
 import os
 import random
 from app.cn_word import query_random_cn_word, update_cn_word, cal_cn_word, add_cn_word
+from app.en_word import query_random_en_word, update_en_word, cal_en_word, add_en_word, query_en_word
 from app.excel_data_syc import cn_word_syc, en_word_syc
 
 
@@ -21,12 +22,14 @@ init_db()
 
 
 image_path = os.path.join(os.path.dirname(__file__), "data/image/")
+en_word_image_path = os.path.join(os.path.dirname(__file__), "data/en_word_image/")
 resource_add_path(os.path.join(os.path.dirname(__file__), "data/fonts/"))
 LabelBase.register('Roboto', 'stkaiti.ttf')
 
 
 display_value = {
-    "cn_word": {"name": "开始", "id": "0", "category": 1, "user": "琦琦", "status": 0, "query_mode": 0}
+    "cn_word": {"name": "开始", "id": "0", "category": 1, "user": "琦琦", "status": 0, "query_mode": 0},
+    "en_word": {"name": "start", "id": "0", "category": 1, "user": "琦琦", "type": 0, "status": 0, "parent_id": 0, "query_mode": 0}
 }
 
 
@@ -80,16 +83,16 @@ class MainLayout(BoxLayout):
             display_value["cn_word"]["category"] = result[0][2]
             display_value["cn_word"]["user"] = result[0][3]
             display_value["cn_word"]["status"] = result[0][4]
-            if len(display_value["cn_word"]["name"]) > 2:
+            if len(display_value["cn_word"]["name"]) <= 2:
                 self.label.font_size = '150sp'
                 self.label.halign = 'center'
-            elif len(display_value["cn_word"]["name"]) > 4:
+            elif len(display_value["cn_word"]["name"]) <= 4:
                 self.label.font_size = '100sp'
                 self.label.halign = 'center'
-            elif len(display_value["cn_word"]["name"]) > 6:
+            elif len(display_value["cn_word"]["name"]) <= 6:
                 self.label.font_size = '50sp'
                 self.label.halign = 'center'
-            elif len(display_value["cn_word"]["name"]) > 8:
+            elif len(display_value["cn_word"]["name"]) <= 8:
                 self.label.font_size = '50sp'
                 self.label.text_size = (self.label.width, None)
                 self.label.halign = 'left'
@@ -183,16 +186,16 @@ class EnLayout(BoxLayout):
         button_layout.add_widget(btn)
 
         layout = BoxLayout(orientation='vertical')
-        self.gif_image = Image(source=os.path.join(image_path, 'dice_1.jpg'))
+        self.gif_image = Image(source=os.path.join(en_word_image_path, 'start.jpg'))
         layout.add_widget(self.gif_image)
 
-        self.label = Label(text=display_value["cn_word"]["name"], font_size='30sp', color=(0, 0, 0, 1))
+        self.label = Label(text=display_value["en_word"]["name"], font_size='30sp', color=(0, 0, 0, 1))
 
         bottom_button_layout = BoxLayout(size_hint_y=None, height=30)
         btn = Button(text='统计', font_size='15sp')
         btn.bind(on_press=self.on_button_cal_press)
         bottom_button_layout.add_widget(btn)
-        self.query_mode_btn = Button(text='随机所有', font_size='15sp')
+        self.query_mode_btn = Button(text='随机未学会单词', font_size='15sp')
         self.query_mode_btn.bind(on_press=self.on_button_en_word_change_press)
         bottom_button_layout.add_widget(self.query_mode_btn)
         btn = Button(text='英文', font_size='15sp')
@@ -214,59 +217,76 @@ class EnLayout(BoxLayout):
         app.root.add_widget(MainLayout())
 
     def on_button_next_one_press(self, instance):
-        if display_value["cn_word"]["query_mode"] != 3:
-            result = query_random_cn_word(display_value["cn_word"]["query_mode"])
-            if result:
-                self.know_button_enable = True
-                display_value["cn_word"]["id"] = result[0][0]
-                display_value["cn_word"]["name"] = result[0][1]
-                display_value["cn_word"]["category"] = result[0][2]
-                display_value["cn_word"]["user"] = result[0][3]
-                display_value["cn_word"]["status"] = result[0][4]
-                if len(display_value["cn_word"]["name"]) > 2:
-                    self.label.font_size = '150sp'
-                    self.label.halign = 'center'
-                elif len(display_value["cn_word"]["name"]) > 4:
-                    self.label.font_size = '100sp'
-                    self.label.halign = 'center'
-                elif len(display_value["cn_word"]["name"]) > 6:
-                    self.label.font_size = '50sp'
-                    self.label.halign = 'center'
-                elif len(display_value["cn_word"]["name"]) > 8:
-                    self.label.font_size = '50sp'
-                    self.label.text_size = (self.label.width, None)
-                    self.label.halign = 'left'
-                else:
-                    self.label.font_size = '200sp'
-                    self.label.halign = 'center'
-
-                self.label.text = display_value["cn_word"]["name"]
+        result = query_random_en_word(display_value["en_word"]["query_mode"])
+        if result:
+            self.know_button_enable = True
+            display_value["en_word"]["id"] = result[0][0]
+            display_value["en_word"]["name"] = result[0][1]
+            display_value["en_word"]["category"] = result[0][2]
+            display_value["en_word"]["user"] = result[0][3]
+            display_value["en_word"]["type"] = result[0][4]
+            display_value["en_word"]["status"] = result[0][5]
+            display_value["en_word"]["parent_id"] = result[0][6]
+            if len(display_value["en_word"]["name"]) <= 2:
+                self.label.font_size = '150sp'
+                self.label.halign = 'center'
+            elif len(display_value["en_word"]["name"]) <= 4:
+                self.label.font_size = '100sp'
+                self.label.halign = 'center'
+            elif len(display_value["en_word"]["name"]) <= 6:
+                self.label.font_size = '50sp'
+                self.label.halign = 'center'
+            elif len(display_value["en_word"]["name"]) <= 8:
+                self.label.font_size = '50sp'
+                self.label.text_size = (self.label.width, None)
+                self.label.halign = 'center'
             else:
-                popup = Popup(title='提示', content=Label(text='查询为空'), size_hint=(None, None))
-                popup.open()
+                self.label.font_size = '200sp'
+                self.label.halign = 'center'
+
+            self.label.text = display_value["en_word"]["name"]
+
+            en_word_image_path_now = os.path.join(en_word_image_path, display_value["en_word"]["name"] + '.jpg')
+            if os.path.exists(en_word_image_path_now):
+                self.gif_image.source = en_word_image_path_now
+            else:
+                en_word_image_path_now = os.path.join(en_word_image_path, 'no_picture.jpg')
+                if display_value["en_word"]["query_mode"] in [3, 4, 5]:
+                    result = query_en_word(None, None, display_value["en_word"]["user"],
+                                           '0', None, display_value["en_word"]["parent_id"])
+                    if result:
+                        en_word_image_path_now = os.path.join(en_word_image_path, result[0][1] + '.jpg')
+                self.gif_image.source = en_word_image_path_now
+        else:
+            popup = Popup(title='提示', content=Label(text='查询为空'), size_hint=(None, None))
+            popup.open()
 
     def on_button_know_press(self, instance):
-        if display_value["cn_word"]["query_mode"] != 3 and self.know_button_enable is True:
-            result = update_cn_word(display_value["cn_word"]["id"], display_value["cn_word"]["category"], 1)
+        if display_value["en_word"]["query_mode"] != 6 and self.know_button_enable is True:
+            result = update_en_word(display_value["en_word"]["id"], display_value["en_word"]["category"], 1)
             if result is not False:
-                display_value["cn_word"]["status"] = 1
+                display_value["en_word"]["status"] = 1
                 self.on_button_next_one_press(instance)
             else:
                 popup = Popup(title='提示', content=Label(text='设置失败'), size_hint=(None, None))
                 popup.open()
 
     def on_button_cal_press(self, instance):
-        all_count, known_count, unknown_count, today_count = cal_cn_word()
-        if all_count is not False and known_count is not False:
+        (all_count_word, all_count_some_word, known_count_word, known_count_some_word,
+         unknown_count, today_count) = cal_en_word()
+        if all_count_word is not False and known_count_word is not False:
             self.know_button_enable = False
             self.label.font_size = '30sp'
             self.label.text_size = (self.label.width, None)
             self.label.halign = 'left'
-            self.label.text = ("所有汉字：{all_count}个\n"
-                               "已学会汉字或词汇：{known_count}个\n"
-                               "未学会汉字或词汇：{unknown_count}个\n"
+            self.label.text = ("所有单词：{all_count_word}个\n"
+                               "所有句子：{all_count_some_word}个\n"
+                               "所有已学会单词：{known_count_word}个\n"
+                               "所有已学会句子：{known_count_some_word}个\n"
+                               "未学会单词或句子：{unknown_count}个\n"
                                "今天学会：{today_count}个"
-                               .format(all_count=all_count[0][0], known_count=known_count[0][0],
+                               .format(all_count_word=all_count_word[0][0], all_count_some_word=all_count_some_word[0][0],
+                                       known_count_word=known_count_word[0][0],known_count_some_word=known_count_some_word[0][0],
                                 unknown_count=unknown_count[0][0], today_count=today_count[0][0]))
         else:
             popup = Popup(title='提示', content=Label(text='统计失败'), size_hint=(None, None))
@@ -279,17 +299,33 @@ class EnLayout(BoxLayout):
         app.root.add_widget(ToolLayout())
 
     def on_button_en_word_change_press(self, instance):
-        if display_value["cn_word"]["query_mode"] == 0:
-            display_value["cn_word"]["query_mode"] = 1     # 随机所有
-            self.query_mode_btn.text = "随机已学会"
+        if display_value["en_word"]["query_mode"] == 0:
+            display_value["en_word"]["query_mode"] = 1
+            self.query_mode_btn.text = "随机所有单词"
             self.on_button_next_one_press(instance)
-        elif display_value["cn_word"]["query_mode"] == 1:
-            display_value["cn_word"]["query_mode"] = 2     # 随机已学会
-            self.query_mode_btn.text = "随机未学会"
+        elif display_value["en_word"]["query_mode"] == 1:
+            display_value["en_word"]["query_mode"] = 2
+            self.query_mode_btn.text = "随机已学会单词"
+            self.on_button_next_one_press(instance)
+        elif display_value["en_word"]["query_mode"] == 2:
+            display_value["en_word"]["query_mode"] = 3
+            self.query_mode_btn.text = "随机未学会句子"
+            self.on_button_next_one_press(instance)
+        elif display_value["en_word"]["query_mode"] == 3:
+            display_value["en_word"]["query_mode"] = 4
+            self.query_mode_btn.text = "随机所有句子"
+            self.on_button_next_one_press(instance)
+        elif display_value["en_word"]["query_mode"] == 4:
+            display_value["en_word"]["query_mode"] = 5
+            self.query_mode_btn.text = "随机已学会句子"
+            self.on_button_next_one_press(instance)
+        elif display_value["en_word"]["query_mode"] == 5:
+            display_value["en_word"]["query_mode"] = 6
+            self.query_mode_btn.text = "随机字母"
             self.on_button_next_one_press(instance)
         else:
-            display_value["cn_word"]["query_mode"] = 0     # 随机未学会
-            self.query_mode_btn.text = "随机所有"
+            display_value["en_word"]["query_mode"] = 0
+            self.query_mode_btn.text = "随机未学会单词"
             self.on_button_next_one_press(instance)
 
 
@@ -317,6 +353,11 @@ class ToolLayout(BoxLayout):
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
         btn = Button(text='同步英文', size_hint=(None, None), size=(150, 50), font_size='30sp')
         btn.bind(on_press=self.show_file_chooser_en)
+        anchor_layout.add_widget(btn)
+        self.add_widget(anchor_layout)
+        anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
+        btn = Button(text='添加英文', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn.bind(on_press=self.add_en_word)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
@@ -362,6 +403,12 @@ class ToolLayout(BoxLayout):
         app = App.get_running_app()
         app.root.clear_widgets()
         app.root.add_widget(AddCnWordLayout())
+
+    @staticmethod
+    def add_en_word(instance):
+        app = App.get_running_app()
+        app.root.clear_widgets()
+        app.root.add_widget(AddEnWordLayout())
 
     def on_button_syc_cn_word_press(self, instance, path, filename):
         if filename:
@@ -493,6 +540,48 @@ class AddCnWordLayout(BoxLayout):
 
     def add(self, instance):
         if add_cn_word(self.text_input_1.text, self.text_input_2.text, self.text_input_3.text, self.text_input_4.text) == True:
+            popup = Popup(title='提示', content=Label(text='添加成功'), size_hint=(None, None))
+        else:
+            popup = Popup(title='提示', content=Label(text='添加失败'), size_hint=(None, None))
+        popup.open()
+
+    @staticmethod
+    def back(instance):
+        app = App.get_running_app()
+        app.root.clear_widgets()
+        app.root.add_widget(ToolLayout())
+
+
+class AddEnWordLayout(BoxLayout):
+    def __init__(self, **kwargs):
+        super(AddEnWordLayout, self).__init__(**kwargs)
+
+        self.orientation = 'vertical'
+
+        self.text_input_1 = TextInput(hint_text='请输入name', height=40, input_type='text', multiline=True, input_filter=None)
+        self.text_input_2 = TextInput(hint_text='请输入category/等级/级别', height=40, input_type='text', input_filter=None)
+        self.text_input_3 = TextInput(hint_text='请输入user/用户', height=40, input_type='text', input_filter=None)
+        self.text_input_4 = TextInput(hint_text='请输入type/单词/句子', height=40, input_type='text', input_filter=None)
+        self.text_input_5 = TextInput(hint_text='请输入status/0-未学会/1-已学会', height=40, input_type='text', input_filter=None)
+        self.text_input_2.text = "1"
+        self.text_input_3.text = "琦琦"
+        self.text_input_4.text = "0"
+        self.text_input_5.text = "0"
+
+        add_button = Button(text='添加', on_press=self.add)
+        return_button = Button(text='返回', on_press=self.back)
+
+        self.add_widget(self.text_input_1)
+        self.add_widget(self.text_input_2)
+        self.add_widget(self.text_input_3)
+        self.add_widget(self.text_input_4)
+        self.add_widget(self.text_input_5)
+        self.add_widget(add_button)
+        self.add_widget(return_button)
+
+    def add(self, instance):
+        if add_en_word(self.text_input_1.text, self.text_input_2.text, self.text_input_3.text, self.text_input_4.text,
+                       self.text_input_4.text):
             popup = Popup(title='提示', content=Label(text='添加成功'), size_hint=(None, None))
         else:
             popup = Popup(title='提示', content=Label(text='添加失败'), size_hint=(None, None))
