@@ -74,7 +74,7 @@ def cal_en_word():
     known_count_word =  select_data(db_path, sql)
     sql = "select count(*) from en_word where status=1 and type=0"
     known_count_some_word =  select_data(db_path, sql)
-    sql = "select count(*) from cn_word where status!=1"
+    sql = "select count(*) from en_word where status!=1"
     unknown_count =  select_data(db_path, sql)
 
     now = datetime.now()
