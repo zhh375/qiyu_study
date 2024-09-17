@@ -276,7 +276,7 @@ class EnLayout(BoxLayout):
          unknown_count, today_count) = cal_en_word()
         if all_count_word is not False and known_count_word is not False:
             self.know_button_enable = False
-            self.label.font_size = '30sp'
+            self.label.font_size = '20sp'
             self.label.text_size = (self.label.width, None)
             self.label.halign = 'left'
             self.label.text = ("所有单词：{all_count_word}个\n"
@@ -288,6 +288,7 @@ class EnLayout(BoxLayout):
                                .format(all_count_word=all_count_word[0][0], all_count_some_word=all_count_some_word[0][0],
                                        known_count_word=known_count_word[0][0],known_count_some_word=known_count_some_word[0][0],
                                 unknown_count=unknown_count[0][0], today_count=today_count[0][0]))
+            self.gif_image.source = os.path.join(en_word_image_path, 'come_on.jpg')
         else:
             popup = Popup(title='提示', content=Label(text='统计失败'), size_hint=(None, None))
             popup.open()
