@@ -2,6 +2,7 @@ from common.sqlite_rw import select_data, delete_data, insert_data, update_data
 import os
 import time
 from datetime import datetime, timedelta
+from app.qianfan_api import qianfan_chat
 
 
 db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "db/qiyu.db")
@@ -73,3 +74,18 @@ def cal_cn_word():
            .format(timestamp_start, timestamp_end))
     today_count =  select_data(db_path, sql)
     return all_count, known_count, unknown_count, today_count
+
+
+def qianfan_chat_cn(chat_type=0):
+    """
+    调用千帆的api
+    :param chat_type:
+    :return:
+    """
+    sql = "select name from cn_word order by random() limit 5"
+    data = select_data(db_path, sql)
+    if data:
+        word_list = [item[0] for item in data]
+        return qianfan_chat(word_list, chat_type)
+    else:
+        return "失败了..."

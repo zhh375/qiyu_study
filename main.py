@@ -13,7 +13,7 @@ from kivy.uix.filechooser import FileChooserListView
 from kivy.resources import resource_add_path
 import os
 import random
-from app.cn_word import query_random_cn_word, update_cn_word, cal_cn_word, add_cn_word
+from app.cn_word import query_random_cn_word, update_cn_word, cal_cn_word, add_cn_word, qianfan_chat_cn
 from app.en_word import query_random_en_word, update_en_word, cal_en_word, add_en_word, query_en_word
 from app.excel_data_syc import cn_word_syc, en_word_syc
 
@@ -125,10 +125,18 @@ class MainLayout(BoxLayout):
                 popup.open()
 
     def on_button_some_word(self, instance):
-        pass
+        result = qianfan_chat_cn(0)
+        self.label.font_size = '20sp'
+        self.label.text_size = (self.label.width, None)
+        self.label.halign = 'left'
+        self.label.text = result
 
     def on_button_many_word(self, instance):
-        pass
+        result = qianfan_chat_cn(1)
+        self.label.font_size = '20sp'
+        self.label.text_size = (self.label.width, None)
+        self.label.halign = 'left'
+        self.label.text = result
 
     def on_button_cal_press(self, instance):
         all_count, known_count, unknown_count, today_count = cal_cn_word()
