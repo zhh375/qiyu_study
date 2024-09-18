@@ -46,7 +46,7 @@ class MainLayout(BoxLayout):
 
         Window.clearcolor = (1, 1, 1, 1)
 
-        button_layout = BoxLayout(size_hint_y=None, height=150)
+        button_layout = BoxLayout(size_hint_y=None, height=200)
         btn = Button(text='下一个', size_hint_x=1.5, font_size='40sp', background_color=(0, 1, 0, 1), color=(1, 1, 1, 1))
         btn.bind(on_press=self.on_button_next_one_press)
         button_layout.add_widget(btn)
@@ -56,11 +56,11 @@ class MainLayout(BoxLayout):
 
         self.label = Label(text=display_value["cn_word"]["name"], font_size='200sp', color=(0, 0, 0, 1))
 
-        bottom_button_layout = BoxLayout(size_hint_y=None, height=100)
+        bottom_button_layout = BoxLayout(size_hint_y=None, height=150)
         btn = Button(text='统计', font_size='20sp')
         btn.bind(on_press=self.on_button_cal_press)
         bottom_button_layout.add_widget(btn)
-        self.query_mode_btn = Button(text='随机未学会', font_size='20sp')
+        self.query_mode_btn = Button(text='未学会', font_size='20sp')
         self.query_mode_btn.bind(on_press=self.on_button_cn_word_change_press)
         bottom_button_layout.add_widget(self.query_mode_btn)
         btn = Button(text='中文', font_size='20sp')
@@ -70,7 +70,7 @@ class MainLayout(BoxLayout):
         btn.bind(on_press=self.on_button_tool_press)
         bottom_button_layout.add_widget(btn)
 
-        bottom1_button_layout = BoxLayout(size_hint_y=None, height=100)
+        bottom1_button_layout = BoxLayout(size_hint_y=None, height=150)
         btn = Button(text='组句', font_size='20sp')
         btn.bind(on_press=self.on_button_some_word)
         bottom1_button_layout.add_widget(btn)
@@ -93,7 +93,7 @@ class MainLayout(BoxLayout):
             display_value["cn_word"]["user"] = result[0][3]
             display_value["cn_word"]["status"] = result[0][4]
             if len(display_value["cn_word"]["name"]) <= 2:
-                self.label.font_size = '150sp'
+                self.label.font_size = '200sp'
                 self.label.halign = 'center'
             elif len(display_value["cn_word"]["name"]) <= 4:
                 self.label.font_size = '100sp'
@@ -170,19 +170,19 @@ class MainLayout(BoxLayout):
     def on_button_cn_word_change_press(self, instance):
         if display_value["cn_word"]["query_mode"] == 0:
             display_value["cn_word"]["query_mode"] = 1     # 随机所有
-            self.query_mode_btn.text = "随机所有"
+            self.query_mode_btn.text = "所有"
             self.on_button_next_one_press(instance)
         elif display_value["cn_word"]["query_mode"] == 1:
             display_value["cn_word"]["query_mode"] = 2     # 随机已学会
-            self.query_mode_btn.text = "随机已学会"
+            self.query_mode_btn.text = "已学会"
             self.on_button_next_one_press(instance)
         elif display_value["cn_word"]["query_mode"] == 2:
             display_value["cn_word"]["query_mode"] = 3     # 随机拼音
-            self.query_mode_btn.text = "随机拼音"
+            self.query_mode_btn.text = "拼音"
             self.on_button_next_one_press(instance)
         else:
             display_value["cn_word"]["query_mode"] = 0     # 随机未学会
-            self.query_mode_btn.text = "随机未学会"
+            self.query_mode_btn.text = "未学会"
             self.on_button_next_one_press(instance)
 
 
@@ -200,7 +200,7 @@ class EnLayout(BoxLayout):
 
         Window.clearcolor = (1, 1, 1, 1)
 
-        button_layout = BoxLayout(size_hint_y=None, height=150)
+        button_layout = BoxLayout(size_hint_y=None, height=200)
         btn = Button(text='下一个', size_hint_x=1.5, font_size='40sp', background_color=(0, 1, 0, 1), color=(1, 1, 1, 1))
         btn.bind(on_press=self.on_button_next_one_press)
         button_layout.add_widget(btn)
@@ -212,13 +212,13 @@ class EnLayout(BoxLayout):
         self.gif_image = Image(source=os.path.join(en_word_image_path, 'start.jpg'))
         layout.add_widget(self.gif_image)
 
-        self.label = Label(text=display_value["en_word"]["name"], font_size='30sp', color=(0, 0, 0, 1))
+        self.label = Label(text=display_value["en_word"]["name"], font_size='50sp', color=(0, 0, 0, 1))
 
-        bottom_button_layout = BoxLayout(size_hint_y=None, height=100)
+        bottom_button_layout = BoxLayout(size_hint_y=None, height=150)
         btn = Button(text='统计', font_size='20sp')
         btn.bind(on_press=self.on_button_cal_press)
         bottom_button_layout.add_widget(btn)
-        self.query_mode_btn = Button(text='随机未学会单词', font_size='20sp')
+        self.query_mode_btn = Button(text='未学会单词', font_size='20sp')
         self.query_mode_btn.bind(on_press=self.on_button_en_word_change_press)
         bottom_button_layout.add_widget(self.query_mode_btn)
         btn = Button(text='英文', font_size='20sp')
@@ -250,10 +250,7 @@ class EnLayout(BoxLayout):
             display_value["en_word"]["type"] = result[0][4]
             display_value["en_word"]["status"] = result[0][5]
             display_value["en_word"]["parent_id"] = result[0][6]
-            if len(display_value["en_word"]["name"]) <= 2:
-                self.label.font_size = '150sp'
-                self.label.halign = 'center'
-            elif len(display_value["en_word"]["name"]) <= 4:
+            if len(display_value["en_word"]["name"]) <= 4:
                 self.label.font_size = '100sp'
                 self.label.halign = 'center'
             elif len(display_value["en_word"]["name"]) <= 6:
@@ -261,10 +258,13 @@ class EnLayout(BoxLayout):
                 self.label.halign = 'center'
             elif len(display_value["en_word"]["name"]) <= 8:
                 self.label.font_size = '50sp'
+                self.label.halign = 'center'
+            elif len(display_value["en_word"]["name"]) <= 10:
+                self.label.font_size = '30sp'
                 self.label.text_size = (self.label.width, None)
                 self.label.halign = 'center'
             else:
-                self.label.font_size = '200sp'
+                self.label.font_size = '100sp'
                 self.label.halign = 'center'
 
             self.label.text = display_value["en_word"]["name"]
@@ -325,31 +325,31 @@ class EnLayout(BoxLayout):
     def on_button_en_word_change_press(self, instance):
         if display_value["en_word"]["query_mode"] == 0:
             display_value["en_word"]["query_mode"] = 1
-            self.query_mode_btn.text = "随机所有单词"
+            self.query_mode_btn.text = "所有单词"
             self.on_button_next_one_press(instance)
         elif display_value["en_word"]["query_mode"] == 1:
             display_value["en_word"]["query_mode"] = 2
-            self.query_mode_btn.text = "随机已学会单词"
+            self.query_mode_btn.text = "已学会单词"
             self.on_button_next_one_press(instance)
         elif display_value["en_word"]["query_mode"] == 2:
             display_value["en_word"]["query_mode"] = 3
-            self.query_mode_btn.text = "随机未学会句子"
+            self.query_mode_btn.text = "未学会句子"
             self.on_button_next_one_press(instance)
         elif display_value["en_word"]["query_mode"] == 3:
             display_value["en_word"]["query_mode"] = 4
-            self.query_mode_btn.text = "随机所有句子"
+            self.query_mode_btn.text = "所有句子"
             self.on_button_next_one_press(instance)
         elif display_value["en_word"]["query_mode"] == 4:
             display_value["en_word"]["query_mode"] = 5
-            self.query_mode_btn.text = "随机已学会句子"
+            self.query_mode_btn.text = "已学会句子"
             self.on_button_next_one_press(instance)
         elif display_value["en_word"]["query_mode"] == 5:
             display_value["en_word"]["query_mode"] = 6
-            self.query_mode_btn.text = "随机字母"
+            self.query_mode_btn.text = "字母"
             self.on_button_next_one_press(instance)
         else:
             display_value["en_word"]["query_mode"] = 0
-            self.query_mode_btn.text = "随机未学会单词"
+            self.query_mode_btn.text = "未学会单词"
             self.on_button_next_one_press(instance)
 
 
@@ -365,37 +365,37 @@ class ToolLayout(BoxLayout):
         Window.clearcolor = (1, 1, 1, 1)
 
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='同步汉字', size_hint=(None, None), size=(450, 100), font_size='30sp')
+        btn = Button(text='同步汉字', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.show_file_chooser_cn)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='添加汉字', size_hint=(None, None), size=(450, 100), font_size='30sp')
+        btn = Button(text='添加汉字', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.add_cn_word)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='同步英文', size_hint=(None, None), size=(450, 100), font_size='30sp')
+        btn = Button(text='同步英文', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.show_file_chooser_en)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='添加英文', size_hint=(None, None), size=(450, 100), font_size='30sp')
+        btn = Button(text='添加英文', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.add_en_word)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='骰子', size_hint=(None, None), size=(450, 100), font_size='30sp')
+        btn = Button(text='骰子', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.dice_page)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='随机数', size_hint=(None, None), size=(450, 100), font_size='30sp')
+        btn = Button(text='随机数', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.rand_page)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text=f'返回', size_hint=(None, None), size=(450, 100), font_size='30sp')
+        btn = Button(text=f'返回', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.on_button_back_press)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
@@ -518,13 +518,13 @@ class DiceLayout(BoxLayout):
         self.add_widget(layout)
 
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='转一次', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn = Button(text='转一次', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.dice_press)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
 
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='返回', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn = Button(text='返回', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.back)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
@@ -632,13 +632,13 @@ class RandLayout(BoxLayout):
         self.add_widget(self.label)
 
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='随机', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn = Button(text='随机', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.rand_press)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
 
         anchor_layout = AnchorLayout(anchor_x='center', anchor_y='center')
-        btn = Button(text='返回', size_hint=(None, None), size=(150, 50), font_size='30sp')
+        btn = Button(text='返回', size_hint=(None, None), size=(600, 150), font_size='30sp')
         btn.bind(on_press=self.back)
         anchor_layout.add_widget(btn)
         self.add_widget(anchor_layout)
