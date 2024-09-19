@@ -53,7 +53,7 @@ def query_random_cn_word(query_mode):
     elif query_mode == 2:
         sql = "select id, name, category, user, status, update_time from cn_word where status=1 and category!=0 order by random() limit 1"
     elif query_mode == 3:
-        sql = "select id, name, category, user, status, update_time from cn_word where category=0 order by random() limit 1"
+        sql = "select id, name, category, user, status, update_time from cn_word where category=999 order by random() limit 1"
     return select_data(db_path, sql)
 
 
