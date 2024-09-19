@@ -50,11 +50,8 @@ class MainLayout(BoxLayout):
         btn = Button(text='下一个', size_hint_x=1.5, font_size='40sp', background_color=(0, 1, 0, 1), color=(1, 1, 1, 1))
         btn.bind(on_press=self.on_button_next_one_press)
         button_layout.add_widget(btn)
-        btn = Button(text=f'已学会', font_size='40sp')
-        btn.bind(on_press=self.on_button_know_press)
-        button_layout.add_widget(btn)
 
-        self.label = Label(text=display_value["cn_word"]["name"], font_size='200sp', color=(0, 0, 0, 1))
+        self.label = Label(text=display_value["cn_word"]["name"], font_size='160sp', color=(0, 0, 0, 1))
 
         bottom_button_layout = BoxLayout(size_hint_y=None, height=150)
         btn = Button(text='统计', font_size='20sp')
@@ -77,6 +74,9 @@ class MainLayout(BoxLayout):
         btn = Button(text='短故事', font_size='20sp')
         btn.bind(on_press=self.on_button_many_word)
         bottom1_button_layout.add_widget(btn)
+        btn = Button(text=f'设置已学会', font_size='20sp')
+        btn.bind(on_press=self.on_button_know_press)
+        bottom1_button_layout.add_widget(btn)
 
         self.add_widget(bottom_button_layout)
         self.add_widget(bottom1_button_layout)
@@ -93,7 +93,7 @@ class MainLayout(BoxLayout):
             display_value["cn_word"]["user"] = result[0][3]
             display_value["cn_word"]["status"] = result[0][4]
             if len(display_value["cn_word"]["name"]) <= 2:
-                self.label.font_size = '200sp'
+                self.label.font_size = '160sp'
                 self.label.halign = 'center'
             elif len(display_value["cn_word"]["name"]) <= 4:
                 self.label.font_size = '100sp'
@@ -111,7 +111,7 @@ class MainLayout(BoxLayout):
 
             self.label.text = display_value["cn_word"]["name"]
         else:
-            popup = Popup(title='提示', content=Label(text='查询为空'), size_hint=(None, None))
+            popup = Popup(title='提示', content=Label(text='查询为空'), size=(800, 400), size_hint=(None, None))
             popup.open()
 
     def on_button_know_press(self, instance):
@@ -121,7 +121,7 @@ class MainLayout(BoxLayout):
                 display_value["cn_word"]["status"] = 1
                 self.on_button_next_one_press(instance)
             else:
-                popup = Popup(title='提示', content=Label(text='设置失败'), size_hint=(None, None))
+                popup = Popup(title='提示', content=Label(text='设置失败'), size=(800, 400), size_hint=(None, None))
                 popup.open()
 
     def on_button_some_word(self, instance):
@@ -152,7 +152,7 @@ class MainLayout(BoxLayout):
                                .format(all_count=all_count[0][0], known_count=known_count[0][0],
                                 unknown_count=unknown_count[0][0], today_count=today_count[0][0]))
         else:
-            popup = Popup(title='提示', content=Label(text='统计失败'), size_hint=(None, None))
+            popup = Popup(title='提示', content=Label(text='统计失败'), size=(800, 400), size_hint=(None, None))
             popup.open()
 
     @staticmethod
@@ -281,7 +281,7 @@ class EnLayout(BoxLayout):
                         en_word_image_path_now = os.path.join(en_word_image_path, result[0][1] + '.jpg')
                 self.gif_image.source = en_word_image_path_now
         else:
-            popup = Popup(title='提示', content=Label(text='查询为空'), size_hint=(None, None))
+            popup = Popup(title='提示', content=Label(text='查询为空'), size=(800, 400), size_hint=(None, None))
             popup.open()
 
     def on_button_know_press(self, instance):
@@ -291,7 +291,7 @@ class EnLayout(BoxLayout):
                 display_value["en_word"]["status"] = 1
                 self.on_button_next_one_press(instance)
             else:
-                popup = Popup(title='提示', content=Label(text='设置失败'), size_hint=(None, None))
+                popup = Popup(title='提示', content=Label(text='设置失败'), size=(800, 400), size_hint=(None, None))
                 popup.open()
 
     def on_button_cal_press(self, instance):
@@ -313,7 +313,7 @@ class EnLayout(BoxLayout):
                                 unknown_count=unknown_count[0][0], today_count=today_count[0][0]))
             self.gif_image.source = os.path.join(en_word_image_path, 'come_on.jpg')
         else:
-            popup = Popup(title='提示', content=Label(text='统计失败'), size_hint=(None, None))
+            popup = Popup(title='提示', content=Label(text='统计失败'), size=(800, 400), size_hint=(None, None))
             popup.open()
 
     @staticmethod
@@ -419,7 +419,7 @@ class ToolLayout(BoxLayout):
         popup_content.add_widget(button_layout)
 
         # 显示弹出窗口
-        self.popup_cn = Popup(title="选择 Excel 文件", content=popup_content, size_hint=(0.9, 0.9))
+        self.popup_cn = Popup(title="选择 Excel 文件", content=popup_content, size=(800, 400), size_hint=(0.9, 0.9))
         self.popup_cn.open()
 
     @staticmethod
@@ -438,9 +438,9 @@ class ToolLayout(BoxLayout):
         if filename:
             filepath = os.path.join(path, filename[0])
             if cn_word_syc(filepath):
-                popup = Popup(title='提示', content=Label(text='同步成功'), size_hint=(None, None))
+                popup = Popup(title='提示', content=Label(text='同步成功'), size=(800, 400), size_hint=(None, None))
             else:
-                popup = Popup(title='提示', content=Label(text='同步失败'), size_hint=(None, None))
+                popup = Popup(title='提示', content=Label(text='同步失败'), size=(800, 400), size_hint=(None, None))
             self.dismiss_popup_cn(instance)
             popup.open()
 
@@ -463,16 +463,16 @@ class ToolLayout(BoxLayout):
         popup_content.add_widget(button_layout)
 
         # 显示弹出窗口
-        self.popup_en = Popup(title="选择 Excel 文件", content=popup_content, size_hint=(0.9, 0.9))
+        self.popup_en = Popup(title="选择 Excel 文件", size=(800, 400), content=popup_content, size_hint=(0.9, 0.9))
         self.popup_en.open()
 
     def on_button_syc_en_word_press(self, instance, path, filename):
         if filename:
             filepath = os.path.join(path, filename[0])
             if en_word_syc(filepath):
-                popup = Popup(title='提示', content=Label(text='同步成功'), size_hint=(None, None))
+                popup = Popup(title='提示', content=Label(text='同步成功'), size=(800, 400), size_hint=(None, None))
             else:
-                popup = Popup(title='提示', content=Label(text='同步失败'), size_hint=(None, None))
+                popup = Popup(title='提示', content=Label(text='同步失败'), size=(800, 400), size_hint=(None, None))
             self.dismiss_popup_en(instance)
             popup.open()
 
@@ -564,9 +564,9 @@ class AddCnWordLayout(BoxLayout):
 
     def add(self, instance):
         if add_cn_word(self.text_input_1.text, self.text_input_2.text, self.text_input_3.text, self.text_input_4.text) == True:
-            popup = Popup(title='提示', content=Label(text='添加成功'), size_hint=(None, None))
+            popup = Popup(title='提示', content=Label(text='添加成功'), size=(800, 400), size_hint=(None, None))
         else:
-            popup = Popup(title='提示', content=Label(text='添加失败'), size_hint=(None, None))
+            popup = Popup(title='提示', content=Label(text='添加失败'), size=(800, 400), size_hint=(None, None))
         popup.open()
 
     @staticmethod
@@ -606,9 +606,9 @@ class AddEnWordLayout(BoxLayout):
     def add(self, instance):
         if add_en_word(self.text_input_1.text, self.text_input_2.text, self.text_input_3.text, self.text_input_4.text,
                        self.text_input_4.text):
-            popup = Popup(title='提示', content=Label(text='添加成功'), size_hint=(None, None))
+            popup = Popup(title='提示', content=Label(text='添加成功'), size=(800, 400), size_hint=(None, None))
         else:
-            popup = Popup(title='提示', content=Label(text='添加失败'), size_hint=(None, None))
+            popup = Popup(title='提示', content=Label(text='添加失败'), size=(800, 400), size_hint=(None, None))
         popup.open()
 
     @staticmethod
