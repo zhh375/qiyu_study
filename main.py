@@ -204,9 +204,11 @@ class EnLayout(BoxLayout):
         btn = Button(text='下一个', size_hint_x=1.5, font_size='40sp', background_color=(0, 1, 0, 1), color=(1, 1, 1, 1))
         btn.bind(on_press=self.on_button_next_one_press)
         button_layout.add_widget(btn)
-        btn = Button(text=f'已学会', font_size='40sp')
+
+        bottom1_button_layout = BoxLayout(size_hint_y=None, height=150)
+        btn = Button(text=f'设置已学会', font_size='40sp')
         btn.bind(on_press=self.on_button_know_press)
-        button_layout.add_widget(btn)
+        bottom1_button_layout.add_widget(btn)
 
         layout = BoxLayout(orientation='vertical')
         self.gif_image = Image(source=os.path.join(en_word_image_path, 'start.jpg'))
@@ -229,6 +231,7 @@ class EnLayout(BoxLayout):
         bottom_button_layout.add_widget(btn)
 
         self.add_widget(bottom_button_layout)
+        self.add_widget(bottom1_button_layout)
         self.add_widget(layout)
         self.add_widget(self.label)
         self.add_widget(button_layout)
