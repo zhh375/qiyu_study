@@ -48,13 +48,13 @@ def query_random_cn_word(query_mode):
     :return:
     """
     sql = ("select id, name, category, user, status, update_time from cn_word where status=0 and category!=0 "
-           "and category！=999 order by random() limit 1")
+           "and category!=999 order by random() limit 1")
     if query_mode == 1:
         sql = ("select id, name, category, user, status, update_time from cn_word where category!=0 "
-               "and category！=999 order by random() limit 1")
+               "and category!=999 order by random() limit 1")
     elif query_mode == 2:
         sql = ("select id, name, category, user, status, update_time from cn_word where status=1 and category!=0 "
-               "and category！=999order by random() limit 1")
+               "and category!=999 order by random() limit 1")
     elif query_mode == 3:
         sql = "select id, name, category, user, status, update_time from cn_word where category=999 order by random() limit 1"
     return select_data(db_path, sql)
@@ -85,7 +85,7 @@ def qianfan_chat_cn(chat_type=0):
     :param chat_type:
     :return:
     """
-    sql = "select name from cn_word order by random() limit 5"
+    sql = "select name from cn_word where category!=999 order by random() limit 5"
     data = select_data(db_path, sql)
     if data:
         word_list = [item[0] for item in data]
