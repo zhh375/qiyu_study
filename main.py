@@ -78,6 +78,9 @@ class MainLayout(BoxLayout):
         bottom_button_layout.add_widget(btn)
 
         bottom1_button_layout = BoxLayout(size_hint_y=None, height=150)
+        btn = Button(text=f'上一个', font_size='40sp')
+        btn.bind(on_press=self.on_button_up_press)
+        bottom1_button_layout.add_widget(btn)
         btn = Button(text='组句', font_size='20sp')
         btn.bind(on_press=self.on_button_some_word)
         bottom1_button_layout.add_widget(btn)
@@ -130,6 +133,14 @@ class MainLayout(BoxLayout):
             self.label.halign = 'center'
 
         self.label.text = display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"]
+
+    def on_button_up_press(self, instance):
+        if display_value_p["cn_word"] > 0:
+            display_value_p["cn_word"] -= 1
+            self.label.text = display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"]
+        else:
+            popup = Popup(title='提示', content=Label(text='已经是第一个了'), size=(800, 400), size_hint=(None, None))
+            popup.open()
 
     def on_button_know_press(self, instance):
         if display_value["cn_word"]["query_mode"] != 3 and self.know_button_enable is True:
@@ -224,6 +235,9 @@ class EnLayout(BoxLayout):
         button_layout.add_widget(btn)
 
         bottom1_button_layout = BoxLayout(size_hint_y=None, height=150)
+        btn = Button(text=f'上一个', font_size='40sp')
+        btn.bind(on_press=self.on_button_up_press)
+        bottom1_button_layout.add_widget(btn)
         btn = Button(text=f'设置已学会', font_size='40sp')
         btn.bind(on_press=self.on_button_know_press)
         bottom1_button_layout.add_widget(btn)
@@ -309,6 +323,14 @@ class EnLayout(BoxLayout):
                 if result:
                     en_word_image_path_now = os.path.join(en_word_image_path, result[0][1] + '.jpg')
             self.gif_image.source = en_word_image_path_now
+
+    def on_button_up_press(self, instance):
+        if display_value_p["en_word"] > 0:
+            display_value_p["en_word"] -= 1
+            self.label.text = display_value["en_word"]["list"][display_value_p["en_word"]]["name"]
+        else:
+            popup = Popup(title='提示', content=Label(text='已经是第一个了'), size=(800, 400), size_hint=(None, None))
+            popup.open()
 
     def on_button_know_press(self, instance):
         if display_value["en_word"]["query_mode"] != 6 and self.know_button_enable is True:
