@@ -94,7 +94,7 @@ class MainLayout(BoxLayout):
         self.add_widget(button_layout)
 
     def on_button_next_one_press(self, instance):
-        if display_value_p["cn_word"] < 10 and len(display_value["cn_word"]["list"]) > display_value_p["cn_word"] + 1:
+        if display_value_p["cn_word"] < 9 and len(display_value["cn_word"]["list"]) > display_value_p["cn_word"] + 1:
             display_value_p["cn_word"] += 1
         else:
             result = query_random_cn_word(display_value["cn_word"]["query_mode"])
@@ -105,7 +105,7 @@ class MainLayout(BoxLayout):
                      "status": result[0][4]})
                 if len(display_value["cn_word"]["list"]) > 10:
                     display_value["cn_word"]["list"].pop(0)
-                if display_value_p["cn_word"] < 10:
+                if display_value_p["cn_word"] < 9:
                     display_value_p["cn_word"] += 1
             else:
                 popup = Popup(title='提示', content=Label(text='查询为空'), size=(800, 400), size_hint=(None, None))
@@ -261,7 +261,7 @@ class EnLayout(BoxLayout):
         app.root.add_widget(MainLayout())
 
     def on_button_next_one_press(self, instance):
-        if display_value_p["en_word"] < 10 and len(display_value["en_word"]["list"]) > display_value_p["en_word"] + 1:
+        if display_value_p["en_word"] < 9 and len(display_value["en_word"]["list"]) > display_value_p["en_word"] + 1:
             display_value_p["en_word"] += 1
         else:
             result = query_random_en_word(display_value["en_word"]["query_mode"])
@@ -272,7 +272,7 @@ class EnLayout(BoxLayout):
                      "type": result[0][4], "status": result[0][5], "parent_id": result[0][6]})
                 if len(display_value["en_word"]["list"]) > 10:
                     display_value["en_word"]["list"].pop(0)
-                if display_value_p["en_word"] < 10:
+                if display_value_p["en_word"] < 9:
                     display_value_p["en_word"] += 1
             else:
                 popup = Popup(title='提示', content=Label(text='查询为空'), size=(800, 400), size_hint=(None, None))
