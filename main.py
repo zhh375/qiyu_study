@@ -78,7 +78,7 @@ class MainLayout(BoxLayout):
         bottom_button_layout.add_widget(btn)
 
         bottom1_button_layout = BoxLayout(size_hint_y=None, height=150)
-        btn = Button(text=f'上一个', font_size='40sp')
+        btn = Button(text=f'上一个', font_size='20sp')
         btn.bind(on_press=self.on_button_up_press)
         bottom1_button_layout.add_widget(btn)
         btn = Button(text='组句', font_size='20sp')
@@ -235,10 +235,10 @@ class EnLayout(BoxLayout):
         button_layout.add_widget(btn)
 
         bottom1_button_layout = BoxLayout(size_hint_y=None, height=150)
-        btn = Button(text=f'上一个', font_size='40sp')
+        btn = Button(text=f'上一个', font_size='20sp')
         btn.bind(on_press=self.on_button_up_press)
         bottom1_button_layout.add_widget(btn)
-        btn = Button(text=f'设置已学会', font_size='40sp')
+        btn = Button(text=f'设置已学会', font_size='20sp')
         btn.bind(on_press=self.on_button_know_press)
         bottom1_button_layout.add_widget(btn)
 
