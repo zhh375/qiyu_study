@@ -28,8 +28,18 @@ LabelBase.register('Roboto', 'stkaiti.ttf')
 
 
 display_value = {
-    "cn_word": {"name": "开始", "id": "0", "category": 1, "user": "琦琦", "status": 0, "query_mode": 0},
-    "en_word": {"name": "start", "id": "0", "category": 1, "user": "琦琦", "type": 0, "status": 0, "parent_id": 0, "query_mode": 0}
+    "cn_word": {
+            "query_mode": 0,
+            "list": [{"name": "开始", "id": "0", "category": 1, "user": "琦琦", "status": 0}]
+        },
+    "en_word": {
+            "query_mode": 0,
+            "list": [{"name": "start", "id": "0", "category": 1, "user": "琦琦", "type": 0, "status": 0, "parent_id": 0}]
+    }
+}
+display_value_p = {
+    "cn_word": 0,
+    "en_word": 0
 }
 
 
@@ -51,7 +61,7 @@ class MainLayout(BoxLayout):
         btn.bind(on_press=self.on_button_next_one_press)
         button_layout.add_widget(btn)
 
-        self.label = Label(text=display_value["cn_word"]["name"], font_size='160sp', color=(0, 0, 0, 1))
+        self.label = Label(text=display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"], font_size='160sp', color=(0, 0, 0, 1))
 
         bottom_button_layout = BoxLayout(size_hint_y=None, height=150)
         btn = Button(text='统计', font_size='20sp')
@@ -84,41 +94,49 @@ class MainLayout(BoxLayout):
         self.add_widget(button_layout)
 
     def on_button_next_one_press(self, instance):
-        result = query_random_cn_word(display_value["cn_word"]["query_mode"])
-        if result:
-            self.know_button_enable = True
-            display_value["cn_word"]["id"] = result[0][0]
-            display_value["cn_word"]["name"] = result[0][1]
-            display_value["cn_word"]["category"] = result[0][2]
-            display_value["cn_word"]["user"] = result[0][3]
-            display_value["cn_word"]["status"] = result[0][4]
-            if len(display_value["cn_word"]["name"]) <= 2:
-                self.label.font_size = '160sp'
-                self.label.halign = 'center'
-            elif len(display_value["cn_word"]["name"]) <= 4:
-                self.label.font_size = '100sp'
-                self.label.halign = 'center'
-            elif len(display_value["cn_word"]["name"]) <= 6:
-                self.label.font_size = '50sp'
-                self.label.halign = 'center'
-            elif len(display_value["cn_word"]["name"]) <= 8:
-                self.label.font_size = '50sp'
-                self.label.text_size = (self.label.width, None)
-                self.label.halign = 'left'
-            else:
-                self.label.font_size = '200sp'
-                self.label.halign = 'center'
-
-            self.label.text = display_value["cn_word"]["name"]
+        if display_value_p["cn_word"] < 10 and len(display_value["cn_word"]["list"]) > display_value_p["cn_word"] + 1:
+            display_value_p["cn_word"] += 1
         else:
-            popup = Popup(title='提示', content=Label(text='查询为空'), size=(800, 400), size_hint=(None, None))
-            popup.open()
+            result = query_random_cn_word(display_value["cn_word"]["query_mode"])
+            if result:
+                self.know_button_enable = True
+                display_value["cn_word"]["list"].append(
+                    {"name": result[0][1], "id": result[0][0], "category": result[0][2], "user": result[0][3],
+                     "status": result[0][4]})
+                if len(display_value["cn_word"]["list"]) > 10:
+                    display_value["cn_word"]["list"].pop(0)
+                if display_value_p["cn_word"] < 10:
+                    display_value_p["cn_word"] += 1
+            else:
+                popup = Popup(title='提示', content=Label(text='查询为空'), size=(800, 400), size_hint=(None, None))
+                popup.open()
+                return
+
+        if len(display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"]) <= 2:
+            self.label.font_size = '160sp'
+            self.label.halign = 'center'
+        elif len(display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"]) <= 4:
+            self.label.font_size = '100sp'
+            self.label.halign = 'center'
+        elif len(display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"]) <= 6:
+            self.label.font_size = '50sp'
+            self.label.halign = 'center'
+        elif len(display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"]) <= 8:
+            self.label.font_size = '50sp'
+            self.label.text_size = (self.label.width, None)
+            self.label.halign = 'left'
+        else:
+            self.label.font_size = '200sp'
+            self.label.halign = 'center'
+
+        self.label.text = display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"]
 
     def on_button_know_press(self, instance):
         if display_value["cn_word"]["query_mode"] != 3 and self.know_button_enable is True:
-            result = update_cn_word(display_value["cn_word"]["id"], display_value["cn_word"]["category"], 1)
+            result = update_cn_word(display_value["cn_word"]["list"][display_value_p["cn_word"]]["id"],
+                                    display_value["cn_word"]["list"][display_value_p["cn_word"]]["category"], 1)
             if result is not False:
-                display_value["cn_word"]["status"] = 1
+                display_value["cn_word"]["list"][display_value_p["cn_word"]]["status"] = 1
                 self.on_button_next_one_press(instance)
             else:
                 popup = Popup(title='提示', content=Label(text='设置失败'), size=(800, 400), size_hint=(None, None))
@@ -214,7 +232,7 @@ class EnLayout(BoxLayout):
         self.gif_image = Image(source=os.path.join(en_word_image_path, 'start.jpg'))
         layout.add_widget(self.gif_image)
 
-        self.label = Label(text=display_value["en_word"]["name"], font_size='50sp', color=(0, 0, 0, 1))
+        self.label = Label(text=display_value["en_word"]["list"][display_value_p["en_word"]]["name"], font_size='50sp', color=(0, 0, 0, 1))
 
         bottom_button_layout = BoxLayout(size_hint_y=None, height=150)
         btn = Button(text='统计', font_size='20sp')
@@ -243,55 +261,61 @@ class EnLayout(BoxLayout):
         app.root.add_widget(MainLayout())
 
     def on_button_next_one_press(self, instance):
-        result = query_random_en_word(display_value["en_word"]["query_mode"])
-        if result:
-            self.know_button_enable = True
-            display_value["en_word"]["id"] = result[0][0]
-            display_value["en_word"]["name"] = result[0][1]
-            display_value["en_word"]["category"] = result[0][2]
-            display_value["en_word"]["user"] = result[0][3]
-            display_value["en_word"]["type"] = result[0][4]
-            display_value["en_word"]["status"] = result[0][5]
-            display_value["en_word"]["parent_id"] = result[0][6]
-            if len(display_value["en_word"]["name"]) <= 4:
-                self.label.font_size = '100sp'
-                self.label.halign = 'center'
-            elif len(display_value["en_word"]["name"]) <= 6:
-                self.label.font_size = '50sp'
-                self.label.halign = 'center'
-            elif len(display_value["en_word"]["name"]) <= 8:
-                self.label.font_size = '50sp'
-                self.label.halign = 'center'
-            elif len(display_value["en_word"]["name"]) <= 10:
-                self.label.font_size = '30sp'
-                self.label.text_size = (self.label.width, None)
-                self.label.halign = 'center'
-            else:
-                self.label.font_size = '100sp'
-                self.label.halign = 'center'
-
-            self.label.text = display_value["en_word"]["name"]
-
-            en_word_image_path_now = os.path.join(en_word_image_path, display_value["en_word"]["name"] + '.jpg')
-            if os.path.exists(en_word_image_path_now):
-                self.gif_image.source = en_word_image_path_now
-            else:
-                en_word_image_path_now = os.path.join(en_word_image_path, 'no_picture.jpg')
-                if display_value["en_word"]["query_mode"] in [3, 4, 5]:
-                    result = query_en_word(None, None, display_value["en_word"]["user"],
-                                           '0', None, display_value["en_word"]["parent_id"])
-                    if result:
-                        en_word_image_path_now = os.path.join(en_word_image_path, result[0][1] + '.jpg')
-                self.gif_image.source = en_word_image_path_now
+        if display_value_p["en_word"] < 10 and len(display_value["en_word"]["list"]) > display_value_p["en_word"] + 1:
+            display_value_p["en_word"] += 1
         else:
-            popup = Popup(title='提示', content=Label(text='查询为空'), size=(800, 400), size_hint=(None, None))
-            popup.open()
+            result = query_random_en_word(display_value["en_word"]["query_mode"])
+            if result:
+                self.know_button_enable = True
+                display_value["en_word"]["list"].append(
+                    {"name": result[0][1], "id": result[0][0], "category": result[0][2], "user": result[0][3],
+                     "type": result[0][4], "status": result[0][5], "parent_id": result[0][6]})
+                if len(display_value["en_word"]["list"]) > 10:
+                    display_value["en_word"]["list"].pop(0)
+                if display_value_p["en_word"] < 10:
+                    display_value_p["en_word"] += 1
+            else:
+                popup = Popup(title='提示', content=Label(text='查询为空'), size=(800, 400), size_hint=(None, None))
+                popup.open()
+
+        if len(display_value["en_word"]["list"][display_value_p["en_word"]]["name"]) <= 4:
+            self.label.font_size = '100sp'
+            self.label.halign = 'center'
+        elif len(display_value["en_word"]["list"][display_value_p["en_word"]]["name"]) <= 6:
+            self.label.font_size = '50sp'
+            self.label.halign = 'center'
+        elif len(display_value["en_word"]["list"][display_value_p["en_word"]]["name"]) <= 8:
+            self.label.font_size = '50sp'
+            self.label.halign = 'center'
+        elif len(display_value["en_word"]["list"][display_value_p["en_word"]]["name"]) <= 10:
+            self.label.font_size = '30sp'
+            self.label.text_size = (self.label.width, None)
+            self.label.halign = 'center'
+        else:
+            self.label.font_size = '100sp'
+            self.label.halign = 'center'
+
+        self.label.text = display_value["en_word"]["list"][display_value_p["en_word"]]["name"]
+
+        en_word_image_path_now = os.path.join(en_word_image_path,
+                                              display_value["en_word"]["list"][display_value_p["en_word"]]["name"] + '.jpg')
+        if os.path.exists(en_word_image_path_now):
+            self.gif_image.source = en_word_image_path_now
+        else:
+            en_word_image_path_now = os.path.join(en_word_image_path, 'no_picture.jpg')
+            if display_value["en_word"]["query_mode"] in [3, 4, 5]:
+                result = query_en_word(None, None, display_value["en_word"]["list"][display_value_p["en_word"]]["user"],
+                                       '0', None, display_value["en_word"]["list"][display_value_p["en_word"]]["parent_id"])
+                if result:
+                    en_word_image_path_now = os.path.join(en_word_image_path, result[0][1] + '.jpg')
+            self.gif_image.source = en_word_image_path_now
 
     def on_button_know_press(self, instance):
         if display_value["en_word"]["query_mode"] != 6 and self.know_button_enable is True:
-            result = update_en_word(display_value["en_word"]["id"], display_value["en_word"]["category"], 1)
+            result = update_en_word(display_value["en_word"]["list"][display_value_p["en_word"]]["id"],
+                                    display_value["en_word"]["list"][display_value_p["en_word"]]["category"], 1)
             if result is not False:
-                display_value["en_word"]["status"] = 1
+                display_value["en_word"]["list"][display_value_p["en_word"]]["status"] = 1
                 self.on_button_next_one_press(instance)
             else:
                 popup = Popup(title='提示', content=Label(text='设置失败'), size=(800, 400), size_hint=(None, None))
