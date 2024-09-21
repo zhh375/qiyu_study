@@ -129,7 +129,7 @@ class MainLayout(BoxLayout):
             self.label.text_size = (self.label.width, None)
             self.label.halign = 'left'
         else:
-            self.label.font_size = '200sp'
+            self.label.font_size = '30sp'
             self.label.halign = 'center'
 
         self.label.text = display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"]
@@ -306,8 +306,9 @@ class EnLayout(BoxLayout):
             self.label.text_size = (self.label.width, None)
             self.label.halign = 'center'
         else:
-            self.label.font_size = '100sp'
-            self.label.halign = 'center'
+            self.label.font_size = '30sp'
+            self.label.text_size = (self.label.width, None)
+            self.label.halign = 'left'
 
         self.label.text = display_value["en_word"]["list"][display_value_p["en_word"]]["name"]
 
