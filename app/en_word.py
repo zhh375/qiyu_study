@@ -65,6 +65,17 @@ def query_random_en_word(query_mode):
     return select_data(db_path, sql)
 
 
+def query_random_en_word_parent_id(parent_id):
+    """
+    随机查询一条记录
+    :param parent_id:
+    :return:
+    """
+    sql = ("select id, name, category, user, type, status, parent_id, update_time from en_word "
+           "where parent_id={} order by random() limit 1").format(parent_id)
+    return select_data(db_path, sql)
+
+
 def cal_en_word():
     sql = "select count(*) from en_word where type=0"
     all_count_word =  select_data(db_path, sql)

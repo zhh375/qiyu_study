@@ -14,7 +14,7 @@ from kivy.resources import resource_add_path
 import os
 import random
 from app.cn_word import query_random_cn_word, update_cn_word, cal_cn_word, add_cn_word, qianfan_chat_cn
-from app.en_word import query_random_en_word, update_en_word, cal_en_word, add_en_word, query_en_word
+from app.en_word import query_random_en_word, update_en_word, cal_en_word, add_en_word, query_en_word, query_random_en_word_parent_id
 from app.excel_data_syc import cn_word_syc, en_word_syc
 
 
@@ -68,6 +68,14 @@ class MainLayout(BoxLayout):
         btn.bind(on_press=self.on_button_cal_press)
         bottom_button_layout.add_widget(btn)
         self.query_mode_btn = Button(text='未学会', font_size='20sp')
+        if display_value["cn_word"]["query_mode"] == 0:
+            self.query_mode_btn.text = "未学会"
+        elif display_value["cn_word"]["query_mode"] == 1:
+            self.query_mode_btn.text = "所有"
+        elif display_value["cn_word"]["query_mode"] == 2:
+            self.query_mode_btn.text = "已学会"
+        else:
+            self.query_mode_btn.text = "拼音"
         self.query_mode_btn.bind(on_press=self.on_button_cn_word_change_press)
         bottom_button_layout.add_widget(self.query_mode_btn)
         btn = Button(text='中文', font_size='20sp')
@@ -238,6 +246,9 @@ class EnLayout(BoxLayout):
         btn = Button(text=f'上一个', font_size='20sp')
         btn.bind(on_press=self.on_button_up_press)
         bottom1_button_layout.add_widget(btn)
+        btn = Button(text=f'换单词', font_size='20sp')
+        btn.bind(on_press=self.on_button_change_word)
+        bottom1_button_layout.add_widget(btn)
         btn = Button(text=f'设置已学会', font_size='20sp')
         btn.bind(on_press=self.on_button_know_press)
         bottom1_button_layout.add_widget(btn)
@@ -253,6 +264,18 @@ class EnLayout(BoxLayout):
         btn.bind(on_press=self.on_button_cal_press)
         bottom_button_layout.add_widget(btn)
         self.query_mode_btn = Button(text='未学会单词', font_size='20sp')
+        if display_value["en_word"]["query_mode"] == 1:
+            self.query_mode_btn.text = "所有单词"
+        elif display_value["en_word"]["query_mode"] == 2:
+            self.query_mode_btn.text = "已学会单词"
+        elif display_value["en_word"]["query_mode"] == 3:
+            self.query_mode_btn.text = "未学会句子"
+        elif display_value["en_word"]["query_mode"] == 4:
+            self.query_mode_btn.text = "所有句子"
+        elif display_value["en_word"]["query_mode"] == 5:
+            self.query_mode_btn.text = "已学会句子"
+        else:
+            self.query_mode_btn.text = "字母"
         self.query_mode_btn.bind(on_press=self.on_button_en_word_change_press)
         bottom_button_layout.add_widget(self.query_mode_btn)
         btn = Button(text='英文', font_size='20sp')
@@ -323,7 +346,20 @@ class EnLayout(BoxLayout):
                                        '0', None, display_value["en_word"]["list"][display_value_p["en_word"]]["parent_id"])
                 if result:
                     en_word_image_path_now = os.path.join(en_word_image_path, result[0][1] + '.jpg')
+                    if os.path.exists(en_word_image_path_now) is False:
+                        en_word_image_path_now = os.path.join(en_word_image_path, 'no_picture.jpg')
             self.gif_image.source = en_word_image_path_now
+
+    def on_button_change_word(self, instance):
+        if display_value["en_word"]["query_mode"] in [3, 4, 5]:
+            result = query_random_en_word_parent_id(display_value["en_word"]["list"][display_value_p["en_word"]]["parent_id"])
+            if result:
+                en_word_image_path_now = os.path.join(en_word_image_path, result[0][1] + '.jpg')
+                if os.path.exists(en_word_image_path_now):
+                    self.gif_image.source = en_word_image_path_now
+        else:
+            popup = Popup(title='提示', content=Label(text='随机句子时按钮才生效'), size=(800, 400), size_hint=(None, None))
+            popup.open()
 
     def on_button_up_press(self, instance):
         if display_value_p["en_word"] > 0:
