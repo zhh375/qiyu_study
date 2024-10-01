@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -49,8 +50,11 @@ class MainLayout(BoxLayout):
         self.orientation = 'vertical'
         self.spacing = 10
         self.padding = 10
+        self.some_word_result = ""
+        self.word = ""
 
         self.know_button_enable = True
+        self.set_btn = None
         self.query_mode_btn = None
         self.label = None
 
@@ -68,14 +72,6 @@ class MainLayout(BoxLayout):
         btn.bind(on_press=self.on_button_cal_press)
         bottom_button_layout.add_widget(btn)
         self.query_mode_btn = Button(text='未学会', font_size='20sp')
-        if display_value["cn_word"]["query_mode"] == 0:
-            self.query_mode_btn.text = "未学会"
-        elif display_value["cn_word"]["query_mode"] == 1:
-            self.query_mode_btn.text = "所有"
-        elif display_value["cn_word"]["query_mode"] == 2:
-            self.query_mode_btn.text = "已学会"
-        else:
-            self.query_mode_btn.text = "拼音"
         self.query_mode_btn.bind(on_press=self.on_button_cn_word_change_press)
         bottom_button_layout.add_widget(self.query_mode_btn)
         btn = Button(text='中文', font_size='20sp')
@@ -95,9 +91,22 @@ class MainLayout(BoxLayout):
         btn = Button(text='短故事', font_size='20sp')
         btn.bind(on_press=self.on_button_many_word)
         bottom1_button_layout.add_widget(btn)
-        btn = Button(text=f'设置已学会', font_size='20sp')
-        btn.bind(on_press=self.on_button_know_press)
-        bottom1_button_layout.add_widget(btn)
+        self.set_btn = Button(text=f'设置已学会', font_size='20sp')
+        self.set_btn.bind(on_press=self.on_button_know_press)
+        bottom1_button_layout.add_widget(self.set_btn)
+
+        if display_value["cn_word"]["query_mode"] == 0:
+            self.query_mode_btn.text = "未学会"
+            self.set_btn.text = "设置已学会"
+        elif display_value["cn_word"]["query_mode"] == 1:
+            self.query_mode_btn.text = "所有"
+            self.set_btn.text = "设置已学会"
+        elif display_value["cn_word"]["query_mode"] == 2:
+            self.query_mode_btn.text = "已学会"
+            self.set_btn.text = "设置未学会"
+        else:
+            self.query_mode_btn.text = "拼音"
+            self.set_btn.text = "设置已学会"
 
         self.add_widget(bottom_button_layout)
         self.add_widget(bottom1_button_layout)
@@ -151,7 +160,7 @@ class MainLayout(BoxLayout):
             popup.open()
 
     def on_button_know_press(self, instance):
-        if display_value["cn_word"]["query_mode"] != 3 and self.know_button_enable is True:
+        if display_value["cn_word"]["query_mode"] not in [2, 3] and self.know_button_enable is True:
             result = update_cn_word(display_value["cn_word"]["list"][display_value_p["cn_word"]]["id"],
                                     display_value["cn_word"]["list"][display_value_p["cn_word"]]["category"], 1)
             if result is not False:
@@ -160,20 +169,37 @@ class MainLayout(BoxLayout):
             else:
                 popup = Popup(title='提示', content=Label(text='设置失败'), size=(800, 400), size_hint=(None, None))
                 popup.open()
+        elif display_value["cn_word"]["query_mode"] == 2 and self.know_button_enable is True:
+            result = update_cn_word(display_value["cn_word"]["list"][display_value_p["cn_word"]]["id"],
+                                    display_value["cn_word"]["list"][display_value_p["cn_word"]]["category"], 0)
+            if result is not False:
+                display_value["cn_word"]["list"][display_value_p["cn_word"]]["status"] = 0
+        else:
+            popup = Popup(title='提示', content=Label(text='无可设置内容！'), size=(800, 400), size_hint=(None, None))
+            popup.open()
 
     def on_button_some_word(self, instance):
-        result = qianfan_chat_cn(0)
-        self.label.font_size = '20sp'
-        self.label.text_size = (self.label.width, None)
-        self.label.halign = 'left'
-        self.label.text = result
+        self.word, self.some_word_result = qianfan_chat_cn(0)
+        Clock.schedule_once(self.show_result, 5)
+
+    def show_result(self, dt):
+        if len(self.some_word_result) != "":
+            self.know_button_enable = False
+            self.label.font_size = '20sp'
+            self.label.text_size = (self.label.width, None)
+            self.label.halign = 'left'
+            self.label.text = ("参考文字：{word}\n"
+                               "\n"
+                               "结果：\n"
+                               "{result}"
+                              .format(word=self.word, result=self.some_word_result))
+        else:
+            popup = Popup(title='提示', content=Label(text='超时了，AI获取结果超时！'), size=(800, 400), size_hint=(None, None))
+            popup.open()
 
     def on_button_many_word(self, instance):
-        result = qianfan_chat_cn(1)
-        self.label.font_size = '20sp'
-        self.label.text_size = (self.label.width, None)
-        self.label.halign = 'left'
-        self.label.text = result
+        self.word, self.some_word_result = qianfan_chat_cn(1)
+        Clock.schedule_once(self.show_result, 5)
 
     def on_button_cal_press(self, instance):
         all_count, known_count, unknown_count, today_count = cal_cn_word()
@@ -182,7 +208,7 @@ class MainLayout(BoxLayout):
             self.label.font_size = '30sp'
             self.label.text_size = (self.label.width, None)
             self.label.halign = 'left'
-            self.label.text = ("所有汉字：{all_count}个\n"
+            self.label.text = ("所有汉字或词汇：{all_count}个\n"
                                "已学会汉字或词汇：{known_count}个\n"
                                "未学会汉字或词汇：{unknown_count}个\n"
                                "今天学会：{today_count}个"
@@ -205,21 +231,26 @@ class MainLayout(BoxLayout):
         app.root.add_widget(EnLayout())
 
     def on_button_cn_word_change_press(self, instance):
+        self.some_word_result = ""
         if display_value["cn_word"]["query_mode"] == 0:
             display_value["cn_word"]["query_mode"] = 1     # 随机所有
             self.query_mode_btn.text = "所有"
+            self.set_btn.text = "设置已学会"
             self.on_button_next_one_press(instance)
         elif display_value["cn_word"]["query_mode"] == 1:
             display_value["cn_word"]["query_mode"] = 2     # 随机已学会
             self.query_mode_btn.text = "已学会"
+            self.set_btn.text = "设置未学会"
             self.on_button_next_one_press(instance)
         elif display_value["cn_word"]["query_mode"] == 2:
             display_value["cn_word"]["query_mode"] = 3     # 随机拼音
             self.query_mode_btn.text = "拼音"
+            self.set_btn.text = "设置已学会"
             self.on_button_next_one_press(instance)
         else:
             display_value["cn_word"]["query_mode"] = 0     # 随机未学会
             self.query_mode_btn.text = "未学会"
+            self.set_btn.text = "设置已学会"
             self.on_button_next_one_press(instance)
 
 
@@ -232,6 +263,7 @@ class EnLayout(BoxLayout):
 
         self.know_button_enable = True
         self.query_mode_btn = None
+        self.set_btn = None
         self.label = None
         self.gif_image = None
 
@@ -249,9 +281,9 @@ class EnLayout(BoxLayout):
         btn = Button(text=f'换单词', font_size='20sp')
         btn.bind(on_press=self.on_button_change_word)
         bottom1_button_layout.add_widget(btn)
-        btn = Button(text=f'设置已学会', font_size='20sp')
-        btn.bind(on_press=self.on_button_know_press)
-        bottom1_button_layout.add_widget(btn)
+        self.set_btn = Button(text=f'设置已学会', font_size='20sp')
+        self.set_btn.bind(on_press=self.on_button_know_press)
+        bottom1_button_layout.add_widget(self.set_btn)
 
         layout = BoxLayout(orientation='vertical')
         self.gif_image = Image(source=os.path.join(en_word_image_path, 'start.jpg'))
@@ -264,18 +296,6 @@ class EnLayout(BoxLayout):
         btn.bind(on_press=self.on_button_cal_press)
         bottom_button_layout.add_widget(btn)
         self.query_mode_btn = Button(text='未学会单词', font_size='20sp')
-        if display_value["en_word"]["query_mode"] == 1:
-            self.query_mode_btn.text = "所有单词"
-        elif display_value["en_word"]["query_mode"] == 2:
-            self.query_mode_btn.text = "已学会单词"
-        elif display_value["en_word"]["query_mode"] == 3:
-            self.query_mode_btn.text = "未学会句子"
-        elif display_value["en_word"]["query_mode"] == 4:
-            self.query_mode_btn.text = "所有句子"
-        elif display_value["en_word"]["query_mode"] == 5:
-            self.query_mode_btn.text = "已学会句子"
-        else:
-            self.query_mode_btn.text = "字母"
         self.query_mode_btn.bind(on_press=self.on_button_en_word_change_press)
         bottom_button_layout.add_widget(self.query_mode_btn)
         btn = Button(text='英文', font_size='20sp')
@@ -284,6 +304,25 @@ class EnLayout(BoxLayout):
         btn = Button(text='工具', font_size='20sp')
         btn.bind(on_press=self.on_button_tool_press)
         bottom_button_layout.add_widget(btn)
+
+        if display_value["en_word"]["query_mode"] == 1:
+            self.query_mode_btn.text = "所有单词"
+            self.set_btn.text = "设置已学会"
+        elif display_value["en_word"]["query_mode"] == 2:
+            self.query_mode_btn.text = "已学会单词"
+            self.set_btn.text = "设置未学会"
+        elif display_value["en_word"]["query_mode"] == 3:
+            self.query_mode_btn.text = "未学会句子"
+            self.set_btn.text = "设置已学会"
+        elif display_value["en_word"]["query_mode"] == 4:
+            self.query_mode_btn.text = "所有句子"
+            self.set_btn.text = "设置已学会"
+        elif display_value["en_word"]["query_mode"] == 5:
+            self.query_mode_btn.text = "已学会句子"
+            self.set_btn.text = "设置未学会"
+        else:
+            self.query_mode_btn.text = "字母"
+            self.set_btn.text = "设置已学会"
 
         self.add_widget(bottom_button_layout)
         self.add_widget(bottom1_button_layout)
@@ -370,7 +409,7 @@ class EnLayout(BoxLayout):
             popup.open()
 
     def on_button_know_press(self, instance):
-        if display_value["en_word"]["query_mode"] != 6 and self.know_button_enable is True:
+        if display_value["en_word"]["query_mode"] not in [2, 5, 6] and self.know_button_enable is True:
             result = update_en_word(display_value["en_word"]["list"][display_value_p["en_word"]]["id"],
                                     display_value["en_word"]["list"][display_value_p["en_word"]]["category"], 1)
             if result is not False:
@@ -379,6 +418,15 @@ class EnLayout(BoxLayout):
             else:
                 popup = Popup(title='提示', content=Label(text='设置失败'), size=(800, 400), size_hint=(None, None))
                 popup.open()
+        elif display_value["en_word"]["query_mode"] in [2, 5] and self.know_button_enable is True:
+            result = update_en_word(display_value["en_word"]["list"][display_value_p["en_word"]]["id"],
+                                    display_value["en_word"]["list"][display_value_p["en_word"]]["category"], 0)
+            if result is not False:
+                display_value["en_word"]["list"][display_value_p["en_word"]]["status"] = 0
+                self.on_button_next_one_press(instance)
+        else:
+            popup = Popup(title='提示', content=Label(text='无可设置内容！'), size=(800, 400), size_hint=(None, None))
+            popup.open()
 
     def on_button_cal_press(self, instance):
         (all_count_word, all_count_some_word, known_count_word, known_count_some_word,
@@ -412,30 +460,37 @@ class EnLayout(BoxLayout):
         if display_value["en_word"]["query_mode"] == 0:
             display_value["en_word"]["query_mode"] = 1
             self.query_mode_btn.text = "所有单词"
+            self.set_btn.text = "设置已学会"
             self.on_button_next_one_press(instance)
         elif display_value["en_word"]["query_mode"] == 1:
             display_value["en_word"]["query_mode"] = 2
             self.query_mode_btn.text = "已学会单词"
+            self.set_btn.text = "设置未学会"
             self.on_button_next_one_press(instance)
         elif display_value["en_word"]["query_mode"] == 2:
             display_value["en_word"]["query_mode"] = 3
+            self.set_btn.text = "设置已学会"
             self.query_mode_btn.text = "未学会句子"
             self.on_button_next_one_press(instance)
         elif display_value["en_word"]["query_mode"] == 3:
             display_value["en_word"]["query_mode"] = 4
+            self.set_btn.text = "设置已学会"
             self.query_mode_btn.text = "所有句子"
             self.on_button_next_one_press(instance)
         elif display_value["en_word"]["query_mode"] == 4:
             display_value["en_word"]["query_mode"] = 5
             self.query_mode_btn.text = "已学会句子"
+            self.set_btn.text = "设置未学会"
             self.on_button_next_one_press(instance)
         elif display_value["en_word"]["query_mode"] == 5:
             display_value["en_word"]["query_mode"] = 6
+            self.set_btn.text = "设置已学会"
             self.query_mode_btn.text = "字母"
             self.on_button_next_one_press(instance)
         else:
             display_value["en_word"]["query_mode"] = 0
             self.query_mode_btn.text = "未学会单词"
+            self.set_btn.text = "设置已学会"
             self.on_button_next_one_press(instance)
 
 

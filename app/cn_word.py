@@ -89,6 +89,8 @@ def qianfan_chat_cn(chat_type=0):
     data = select_data(db_path, sql)
     if data:
         word_list = [item[0] for item in data]
-        return qianfan_chat(word_list, chat_type)
+        if chat_type == 0:
+            return word_list[0], qianfan_chat(word_list, chat_type)
+        return word_list, qianfan_chat(word_list, chat_type)
     else:
         return "失败了..."

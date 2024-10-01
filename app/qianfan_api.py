@@ -18,7 +18,7 @@ def get_access_token():
 def qianfan_chat(word_list, type_chat=0):
     url = ("https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions?access_token=" + get_access_token())
     if type_chat == 0:
-        content = "用下面的汉字和笔画较少的汉字组一个不少于10个字且不超过20个字的短句：" + " ".join(word_list)
+        content = "用下面的汉字和笔画较少的汉字组一个不少于10个字且不超过20个字的短句：" + " ".join(word_list[0])
     else:
         content = "用下面的汉字和笔画较少的汉字组一个不超过50个字的故事：" + " ".join(word_list)
     payload = json.dumps({"messages": [{"role": "user", "content": content}]})
