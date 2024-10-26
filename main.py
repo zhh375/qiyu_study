@@ -1,3 +1,5 @@
+import time
+
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
@@ -8,12 +10,13 @@ from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 from app.init_db import init_db
 from kivy.core.text import LabelBase
+from kivy.core.audio import SoundLoader
 from kivy.uix.image import Image
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.filechooser import FileChooserListView
 from kivy.resources import resource_add_path
 import os
-import pyttsx3
+from gtts import gTTS
 import random
 from app.cn_word import query_random_cn_word, update_cn_word, cal_cn_word, add_cn_word, qianfan_chat_cn
 from app.en_word import query_random_en_word, update_en_word, cal_en_word, add_en_word, query_en_word, query_random_en_word_parent_id
@@ -21,14 +24,6 @@ from app.excel_data_syc import cn_word_syc, en_word_syc
 
 
 init_db()
-
-engine = pyttsx3.init()
-rate = engine.getProperty('rate')
-engine.setProperty('rate', 150)
-volume = engine.getProperty('volume')
-engine.setProperty('volume', 1.0)
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
 
 
 image_path = os.path.join(os.path.dirname(__file__), "data/image/")
@@ -417,8 +412,28 @@ class EnLayout(BoxLayout):
 
     @staticmethod
     def on_button_say(self):
-        engine.say(display_value["en_word"]["list"][display_value_p["en_word"]]["name"])
-        engine.runAndWait()
+        text = display_value["en_word"]["list"][display_value_p["en_word"]]["name"]
+        if text:
+            popup_wait = Popup(title='加载中', content=Label(text='加载中...'), size=(800, 400), size_hint=(None, None), auto_dismiss=False)
+            popup_wait.open()
+            try:
+                tts = gTTS(text=text, lang='en', timeout=5)
+                audio_file = "output.mp3"
+                tts.save(audio_file)
+                sound = SoundLoader.load(audio_file)
+                if sound:
+                    sound.play()
+                    sound.bind(on_stop=lambda *args: os.remove(audio_file))
+                else:
+                    popup = Popup(title='提示', content=Label(text='Failed to load audio file'), size=(1000, 400), size_hint=(None, None))
+                    popup.open()
+            except Exception as e:
+                popup = Popup(title='提示', size=(1000, 400), size_hint=(None, None))
+                label = Label(text='Maybe connect google api failed, Unexpected error:{}'.format(e), text_size=(1000, None), halign='left', valign='middle')
+                popup.content = label
+                popup.open()
+            finally:
+                popup_wait.dismiss()
 
     def on_button_up_press(self, instance):
         if display_value_p["en_word"] > 0:
@@ -812,6 +827,7 @@ class RandLayout(BoxLayout):
         app = App.get_running_app()
         app.root.clear_widgets()
         app.root.add_widget(ToolLayout())
+
 
 class QiyuApp(App):
     def build(self):
