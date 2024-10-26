@@ -428,8 +428,8 @@ class EnLayout(BoxLayout):
                     popup = Popup(title='提示', content=Label(text='Failed to load audio file'), size=(1000, 400), size_hint=(None, None))
                     popup.open()
             except Exception as e:
-                popup = Popup(title='提示', size=(1000, 400), size_hint=(None, None))
-                label = Label(text='Maybe connect google api failed, Unexpected error:{}'.format(e), text_size=(1000, None), halign='left', valign='middle')
+                popup = Popup(title='提示', size=(1000, 600), size_hint=(None, None))
+                label = Label(text='Maybe connect google api failed, Unexpected error:{}'.format(e), text_size=(1000, None), halign='center', valign='middle')
                 popup.content = label
                 popup.open()
             finally:
