@@ -13,6 +13,7 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.filechooser import FileChooserListView
 from kivy.resources import resource_add_path
 import os
+import pyttsx3
 import random
 from app.cn_word import query_random_cn_word, update_cn_word, cal_cn_word, add_cn_word, qianfan_chat_cn
 from app.en_word import query_random_en_word, update_en_word, cal_en_word, add_en_word, query_en_word, query_random_en_word_parent_id
@@ -20,6 +21,14 @@ from app.excel_data_syc import cn_word_syc, en_word_syc
 
 
 init_db()
+
+engine = pyttsx3.init()
+rate = engine.getProperty('rate')
+engine.setProperty('rate', 150)
+volume = engine.getProperty('volume')
+engine.setProperty('volume', 1.0)
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[1].id)
 
 
 image_path = os.path.join(os.path.dirname(__file__), "data/image/")
@@ -281,6 +290,9 @@ class EnLayout(BoxLayout):
         btn = Button(text=f'换单词', font_size='20sp')
         btn.bind(on_press=self.on_button_change_word)
         bottom1_button_layout.add_widget(btn)
+        btn = Button(text=f'播放', font_size='20sp')
+        btn.bind(on_press=self.on_button_say)
+        bottom1_button_layout.add_widget(btn)
         self.set_btn = Button(text=f'设置已学会', font_size='20sp')
         self.set_btn.bind(on_press=self.on_button_know_press)
         bottom1_button_layout.add_widget(self.set_btn)
@@ -320,8 +332,11 @@ class EnLayout(BoxLayout):
         elif display_value["en_word"]["query_mode"] == 5:
             self.query_mode_btn.text = "已学会句子"
             self.set_btn.text = "设置未学会"
-        else:
+        elif display_value["en_word"]["query_mode"] == 6:
             self.query_mode_btn.text = "字母"
+            self.set_btn.text = "设置已学会"
+        else:
+            self.query_mode_btn.text = "未学会单词"
             self.set_btn.text = "设置已学会"
 
         self.add_widget(bottom_button_layout)
@@ -399,6 +414,11 @@ class EnLayout(BoxLayout):
         else:
             popup = Popup(title='提示', content=Label(text='随机句子时按钮才生效'), size=(800, 400), size_hint=(None, None))
             popup.open()
+
+    @staticmethod
+    def on_button_say(self):
+        engine.say(display_value["en_word"]["list"][display_value_p["en_word"]]["name"])
+        engine.runAndWait()
 
     def on_button_up_press(self, instance):
         if display_value_p["en_word"] > 0:
