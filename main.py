@@ -118,7 +118,7 @@ class MainLayout(BoxLayout):
         self.add_widget(button_layout)
 
     def on_button_next_one_press(self, instance):
-        if display_value_p["cn_word"] < 9 and len(display_value["cn_word"]["list"]) > display_value_p["cn_word"] + 1:
+        if display_value_p["cn_word"] < 49 and len(display_value["cn_word"]["list"]) > display_value_p["cn_word"] + 1:
             display_value_p["cn_word"] += 1
         else:
             result = query_random_cn_word(display_value["cn_word"]["query_mode"])
@@ -127,9 +127,9 @@ class MainLayout(BoxLayout):
                 display_value["cn_word"]["list"].append(
                     {"name": result[0][1], "id": result[0][0], "category": result[0][2], "user": result[0][3],
                      "status": result[0][4]})
-                if len(display_value["cn_word"]["list"]) > 10:
+                if len(display_value["cn_word"]["list"]) > 50:
                     display_value["cn_word"]["list"].pop(0)
-                if display_value_p["cn_word"] < 9:
+                if display_value_p["cn_word"] < 49:
                     display_value_p["cn_word"] += 1
             else:
                 popup = Popup(title='提示', content=Label(text='查询为空'), size=(800, 400), size_hint=(None, None))
@@ -154,30 +154,46 @@ class MainLayout(BoxLayout):
             self.label.halign = 'center'
 
         self.label.text = display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"]
+        if display_value["cn_word"]["list"][display_value_p["cn_word"]]["status"] == 1:
+            self.set_btn.text = "设置未学会"
+        else:
+            self.set_btn.text = "设置已学会"
 
     def on_button_up_press(self, instance):
         if display_value_p["cn_word"] > 0:
             display_value_p["cn_word"] -= 1
             self.label.text = display_value["cn_word"]["list"][display_value_p["cn_word"]]["name"]
+            if display_value["cn_word"]["list"][display_value_p["cn_word"]]["status"] == 1:
+                self.set_btn.text = "设置未学会"
+            else:
+                self.set_btn.text = "设置已学会"
         else:
             popup = Popup(title='提示', content=Label(text='已经是第一个了'), size=(800, 400), size_hint=(None, None))
             popup.open()
 
     def on_button_know_press(self, instance):
         if display_value["cn_word"]["query_mode"] not in [2, 3] and self.know_button_enable is True:
+            if display_value["cn_word"]["list"][display_value_p["cn_word"]]["status"] == 1:
+                status = 0
+            else:
+                status = 1
             result = update_cn_word(display_value["cn_word"]["list"][display_value_p["cn_word"]]["id"],
-                                    display_value["cn_word"]["list"][display_value_p["cn_word"]]["category"], 1)
+                                    display_value["cn_word"]["list"][display_value_p["cn_word"]]["category"], status)
             if result is not False:
-                display_value["cn_word"]["list"][display_value_p["cn_word"]]["status"] = 1
+                display_value["cn_word"]["list"][display_value_p["cn_word"]]["status"] = status
                 self.on_button_next_one_press(instance)
             else:
                 popup = Popup(title='提示', content=Label(text='设置失败'), size=(800, 400), size_hint=(None, None))
                 popup.open()
         elif display_value["cn_word"]["query_mode"] == 2 and self.know_button_enable is True:
+            if display_value["cn_word"]["list"][display_value_p["cn_word"]]["status"] == 1:
+                status = 0
+            else:
+                status = 1
             result = update_cn_word(display_value["cn_word"]["list"][display_value_p["cn_word"]]["id"],
-                                    display_value["cn_word"]["list"][display_value_p["cn_word"]]["category"], 0)
+                                    display_value["cn_word"]["list"][display_value_p["cn_word"]]["category"], status)
             if result is not False:
-                display_value["cn_word"]["list"][display_value_p["cn_word"]]["status"] = 0
+                display_value["cn_word"]["list"][display_value_p["cn_word"]]["status"] = status
         else:
             popup = Popup(title='提示', content=Label(text='无可设置内容！'), size=(800, 400), size_hint=(None, None))
             popup.open()
@@ -347,7 +363,7 @@ class EnLayout(BoxLayout):
         app.root.add_widget(MainLayout())
 
     def on_button_next_one_press(self, instance):
-        if display_value_p["en_word"] < 9 and len(display_value["en_word"]["list"]) > display_value_p["en_word"] + 1:
+        if display_value_p["en_word"] < 49 and len(display_value["en_word"]["list"]) > display_value_p["en_word"] + 1:
             display_value_p["en_word"] += 1
         else:
             result = query_random_en_word(display_value["en_word"]["query_mode"])
@@ -356,9 +372,9 @@ class EnLayout(BoxLayout):
                 display_value["en_word"]["list"].append(
                     {"name": result[0][1], "id": result[0][0], "category": result[0][2], "user": result[0][3],
                      "type": result[0][4], "status": result[0][5], "parent_id": result[0][6]})
-                if len(display_value["en_word"]["list"]) > 10:
+                if len(display_value["en_word"]["list"]) > 50:
                     display_value["en_word"]["list"].pop(0)
-                if display_value_p["en_word"] < 9:
+                if display_value_p["en_word"] < 49:
                     display_value_p["en_word"] += 1
             else:
                 popup = Popup(title='提示', content=Label(text='查询为空'), size=(800, 400), size_hint=(None, None))
@@ -383,6 +399,10 @@ class EnLayout(BoxLayout):
             self.label.halign = 'left'
 
         self.label.text = display_value["en_word"]["list"][display_value_p["en_word"]]["name"]
+        if display_value["en_word"]["list"][display_value_p["en_word"]]["status"] == 1:
+            self.set_btn.text = "设置未学会"
+        else:
+            self.set_btn.text = "设置已学会"
 
         en_word_image_path_now = os.path.join(en_word_image_path,
                                               display_value["en_word"]["list"][display_value_p["en_word"]]["name"] + '.jpg')
@@ -428,7 +448,7 @@ class EnLayout(BoxLayout):
                     popup = Popup(title='提示', content=Label(text='Failed to load audio file'), size=(1000, 400), size_hint=(None, None))
                     popup.open()
             except Exception as e:
-                popup = Popup(title='提示', size=(1000, 600), size_hint=(None, None))
+                popup = Popup(title='提示', size=(1200, 800), size_hint=(None, None))
                 label = Label(text='Maybe connect google api failed, Unexpected error:{}'.format(e), text_size=(1000, None), halign='center', valign='middle')
                 popup.content = label
                 popup.open()
@@ -439,25 +459,37 @@ class EnLayout(BoxLayout):
         if display_value_p["en_word"] > 0:
             display_value_p["en_word"] -= 1
             self.label.text = display_value["en_word"]["list"][display_value_p["en_word"]]["name"]
+            if display_value["en_word"]["list"][display_value_p["en_word"]]["status"] == 1:
+                self.set_btn.text = "设置未学会"
+            else:
+                self.set_btn.text = "设置已学会"
         else:
             popup = Popup(title='提示', content=Label(text='已经是第一个了'), size=(800, 400), size_hint=(None, None))
             popup.open()
 
     def on_button_know_press(self, instance):
         if display_value["en_word"]["query_mode"] not in [2, 5, 6] and self.know_button_enable is True:
+            if display_value["en_word"]["list"][display_value_p["en_word"]]["status"] == 0:
+                status = 1
+            else:
+                status = 0
             result = update_en_word(display_value["en_word"]["list"][display_value_p["en_word"]]["id"],
-                                    display_value["en_word"]["list"][display_value_p["en_word"]]["category"], 1)
+                                    display_value["en_word"]["list"][display_value_p["en_word"]]["category"], status)
             if result is not False:
-                display_value["en_word"]["list"][display_value_p["en_word"]]["status"] = 1
+                display_value["en_word"]["list"][display_value_p["en_word"]]["status"] = status
                 self.on_button_next_one_press(instance)
             else:
                 popup = Popup(title='提示', content=Label(text='设置失败'), size=(800, 400), size_hint=(None, None))
                 popup.open()
         elif display_value["en_word"]["query_mode"] in [2, 5] and self.know_button_enable is True:
+            if display_value["en_word"]["list"][display_value_p["en_word"]]["status"] == 0:
+                status = 1
+            else:
+                status = 0
             result = update_en_word(display_value["en_word"]["list"][display_value_p["en_word"]]["id"],
-                                    display_value["en_word"]["list"][display_value_p["en_word"]]["category"], 0)
+                                    display_value["en_word"]["list"][display_value_p["en_word"]]["category"], status)
             if result is not False:
-                display_value["en_word"]["list"][display_value_p["en_word"]]["status"] = 0
+                display_value["en_word"]["list"][display_value_p["en_word"]]["status"] = status
                 self.on_button_next_one_press(instance)
         else:
             popup = Popup(title='提示', content=Label(text='无可设置内容！'), size=(800, 400), size_hint=(None, None))
