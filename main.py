@@ -284,8 +284,10 @@ class EnLayout(BoxLayout):
         self.know_button_enable = True
         self.query_mode_btn = None
         self.set_btn = None
+        self.category_btn = None
         self.label = None
         self.gif_image = None
+        self.category = 0     # 0-全部，1-其它，2-牛津树，3-海尼曼，4-英语启蒙Olga
 
         Window.clearcolor = (1, 1, 1, 1)
 
@@ -293,6 +295,9 @@ class EnLayout(BoxLayout):
         btn = Button(text='下一个', size_hint_x=1.5, font_size='40sp', background_color=(0, 1, 0, 1), color=(1, 1, 1, 1))
         btn.bind(on_press=self.on_button_next_one_press)
         button_layout.add_widget(btn)
+        self.category_btn = Button(text='类别-\n全部', size_hint_x=1, font_size='20sp')
+        self.category_btn.bind(on_press=self.on_button_category_press)
+        button_layout.add_widget(self.category_btn)
 
         bottom1_button_layout = BoxLayout(size_hint_y=None, height=150)
         btn = Button(text=f'上一个', font_size='20sp')
@@ -366,7 +371,7 @@ class EnLayout(BoxLayout):
         if display_value_p["en_word"] < 49 and len(display_value["en_word"]["list"]) > display_value_p["en_word"] + 1:
             display_value_p["en_word"] += 1
         else:
-            result = query_random_en_word(display_value["en_word"]["query_mode"])
+            result = query_random_en_word(display_value["en_word"]["query_mode"], self.category)
             if result:
                 self.know_button_enable = True
                 display_value["en_word"]["list"].append(
@@ -522,6 +527,28 @@ class EnLayout(BoxLayout):
         app = App.get_running_app()
         app.root.clear_widgets()
         app.root.add_widget(ToolLayout())
+
+    def on_button_category_press(self, instance):
+        if self.category == 0:
+            self.category = 2
+            self.category_btn.text = "类别-\n牛津树"
+            self.on_button_next_one_press(instance)
+        elif self.category == 2:
+            self.category = 3
+            self.category_btn.text = "类别-\n海尼曼"
+            self.on_button_next_one_press(instance)
+        elif self.category == 3:
+            self.category = 4
+            self.category_btn.text = "类别-\n英语启蒙Olga"
+            self.on_button_next_one_press(instance)
+        elif self.category == 4:
+            self.category = 1
+            self.category_btn.text = "类别-\n其它"
+            self.on_button_next_one_press(instance)
+        else:
+            self.category = 0
+            self.category_btn.text = "类别-\n全部"
+            self.on_button_next_one_press(instance)
 
     def on_button_en_word_change_press(self, instance):
         if display_value["en_word"]["query_mode"] == 0:

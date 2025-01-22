@@ -42,25 +42,33 @@ def update_en_word(word_id, category, status):
            .format(category, status, int(time.time()), word_id))
     return update_data(db_path, sql)
 
-def query_random_en_word(query_mode):
+def query_random_en_word(query_mode, category=0):
     """
     随机查询一条记录
+    :param category: 类别1-其它，2-牛津树，3-海尼曼，4-英语启蒙Olga
     :param query_mode: 0-随机未学会单词， 1-随机所有单词， 2-随机已学会单词， 3-随机未学会句子， 4-随机所有句子， 5随机已学会句子， 6-随机字母
     :return:
     """
-    sql = "select id, name, category, user, type, status, parent_id, update_time from en_word where status=0 and type=0 order by random() limit 1"
+    sql = ("select id, name, category, user, type, status, parent_id, update_time from en_word "
+           "where status=0 and type=0 and category={category} order by random() limit 1".format(category=category))
     if query_mode == 1:
-        sql = "select id, name, category, user, type, status, parent_id, update_time from en_word where type=0 order by random() limit 1"
+        sql = ("select id, name, category, user, type, status, parent_id, update_time from en_word "
+               "where type=0 and category={category} order by random() limit 1".format(category=category))
     elif query_mode == 2:
-        sql = "select id, name, category, user, type, status, parent_id, update_time from en_word where status=1 and type=0 order by random() limit 1"
+        sql = ("select id, name, category, user, type, status, parent_id, update_time from en_word "
+               "where status=1 and type=0 and category={category} order by random() limit 1".format(category=category))
     elif query_mode == 3:
-        sql = "select id, name, category, user, type, status, parent_id, update_time from en_word where status=0 and type=1 order by random() limit 1"
+        sql = ("select id, name, category, user, type, status, parent_id, update_time from en_word "
+               "where status=0 and type=1 and category={category} order by random() limit 1".format(category=category))
     elif query_mode == 4:
-        sql = "select id, name, category, user, type, status, parent_id, update_time from en_word where type=1 order by random() limit 1"
+        sql = ("select id, name, category, user, type, status, parent_id, update_time from en_word "
+               "where type=1 and category={category} order by random() limit 1".format(category=category))
     elif query_mode == 5:
-        sql = "select id, name, category, user, type, status, parent_id, update_time from en_word where status=1 and type=1 order by random() limit 1"
+        sql = ("select id, name, category, user, type, status, parent_id, update_time from en_word "
+               "where status=1 and type=1 and category={category} order by random() limit 1".format(category=category))
     elif query_mode == 6:
-        sql = "select id, name, category, user, type, status, parent_id, update_time from en_word where type=2 order by random() limit 1"
+        sql = ("select id, name, category, user, type, status, parent_id, update_time from en_word "
+               "where type=2 and category={category} order by random() limit 1".format(category=category))
 
     return select_data(db_path, sql)
 
