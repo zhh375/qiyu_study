@@ -1,5 +1,4 @@
 import time
-
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
@@ -18,6 +17,8 @@ from kivy.resources import resource_add_path
 import os
 from gtts import gTTS
 import random
+import requests
+from app.qianfan_api import qianfan_image
 from app.cn_word import query_random_cn_word, update_cn_word, cal_cn_word, add_cn_word, qianfan_chat_cn
 from app.en_word import query_random_en_word, update_en_word, cal_en_word, add_en_word, query_en_word, query_random_en_word_parent_id
 from app.excel_data_syc import cn_word_syc, en_word_syc
@@ -287,14 +288,15 @@ class EnLayout(BoxLayout):
         self.category_btn = None
         self.label = None
         self.gif_image = None
+        self.next_btn = None
         self.category = 0     # 0-全部，1-其它，2-牛津树，3-海尼曼，4-英语启蒙Olga
 
         Window.clearcolor = (1, 1, 1, 1)
 
         button_layout = BoxLayout(size_hint_y=None, height=200)
-        btn = Button(text='下一个', size_hint_x=1.5, font_size='40sp', background_color=(0, 1, 0, 1), color=(1, 1, 1, 1))
-        btn.bind(on_press=self.on_button_next_one_press)
-        button_layout.add_widget(btn)
+        self.next_btn = Button(text='下一个', size_hint_x=1.5, font_size='40sp', background_color=(0, 1, 0, 1), color=(1, 1, 1, 1))
+        self.next_btn.bind(on_press=self.on_button_next_one_press)
+        button_layout.add_widget(self.next_btn)
         self.category_btn = Button(text='类别-\n全部', size_hint_x=1, font_size='20sp')
         self.category_btn.bind(on_press=self.on_button_category_press)
         button_layout.add_widget(self.category_btn)
@@ -411,6 +413,8 @@ class EnLayout(BoxLayout):
 
         en_word_image_path_now = os.path.join(en_word_image_path,
                                               display_value["en_word"]["list"][display_value_p["en_word"]]["name"] + '.jpg')
+        en_word_image_path_now_png = os.path.join(en_word_image_path,
+                                              display_value["en_word"]["list"][display_value_p["en_word"]]["name"] + '.png')
         if os.path.exists(en_word_image_path_now):
             self.gif_image.source = en_word_image_path_now
         else:
@@ -422,6 +426,29 @@ class EnLayout(BoxLayout):
                     en_word_image_path_now = os.path.join(en_word_image_path, result[0][1] + '.jpg')
                     if os.path.exists(en_word_image_path_now) is False:
                         en_word_image_path_now = os.path.join(en_word_image_path, 'no_picture.jpg')
+            else:
+                en_word_image_path_now = en_word_image_path_now_png
+                if os.path.exists(en_word_image_path_now) is False:
+                    self.next_btn.text = "生成图片中..."
+                    self.next_btn.disabled = True
+                    image_url = qianfan_image(display_value["en_word"]["list"][display_value_p["en_word"]]["name"])
+                    if image_url:
+                        try:
+                            response = requests.get(image_url)
+                            if response.status_code == 200:
+                                with open(en_word_image_path_now, 'wb') as f:
+                                    f.write(response.content)
+                            else:
+                                en_word_image_path_now = os.path.join(en_word_image_path, 'no_picture.jpg')
+                                popup = Popup(title='提示', content=Label(text='下载图片失败'), size=(800, 400), size_hint=(None, None))
+                                popup.open()
+                        except Exception as e:
+                            en_word_image_path_now = os.path.join(en_word_image_path, 'no_picture.jpg')
+                            popup = Popup(title='提示', content=Label(text=f'下载图片时发生错误: {e}'), size=(800, 400), size_hint=(None, None))
+                            popup.open()
+
+            self.next_btn.text = "下一个"
+            self.next_btn.disabled = False
             self.gif_image.source = en_word_image_path_now
 
     def on_button_change_word(self, instance):
@@ -464,6 +491,14 @@ class EnLayout(BoxLayout):
         if display_value_p["en_word"] > 0:
             display_value_p["en_word"] -= 1
             self.label.text = display_value["en_word"]["list"][display_value_p["en_word"]]["name"]
+            en_word_image_path_now = os.path.join(en_word_image_path, display_value["en_word"]["list"][display_value_p["en_word"]]["name"] + '.jpg')
+            en_word_image_path_now_png = os.path.join(en_word_image_path, display_value["en_word"]["list"][display_value_p["en_word"]]["name"] + '.png')
+            if os.path.exists(en_word_image_path_now):
+                self.gif_image.source = en_word_image_path_now
+            elif os.path.exists(en_word_image_path_now_png):
+                self.gif_image.source = en_word_image_path_now_png
+            else:
+                self.gif_image.source = os.path.join(en_word_image_path, 'no_picture.jpg')
             if display_value["en_word"]["list"][display_value_p["en_word"]]["status"] == 1:
                 self.set_btn.text = "设置未学会"
             else:
